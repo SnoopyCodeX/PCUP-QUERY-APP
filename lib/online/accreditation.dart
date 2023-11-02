@@ -8,11 +8,16 @@ import 'package:query_app/online/household.dart';
 import 'package:query_app/online/main.dart';
 
 class AccreditationScreen extends StatefulWidget {
+  final Map<String, dynamic> userData;
+
+  AccreditationScreen({required this.userData});
   @override
-  _AccreditationScreenState createState() => _AccreditationScreenState();
+  _AccreditationScreenState createState() =>
+      _AccreditationScreenState(userData: userData);
 }
 
 class _AccreditationScreenState extends State<AccreditationScreen> {
+  final Map<String, dynamic> userData;
   List<Map<String, dynamic>> accreditations = [];
   String message = '';
   TextEditingController nameController = TextEditingController();
@@ -20,6 +25,7 @@ class _AccreditationScreenState extends State<AccreditationScreen> {
   TextEditingController presidentController = TextEditingController();
   TextEditingController contactController = TextEditingController();
   TextEditingController sexController = TextEditingController();
+  _AccreditationScreenState({required this.userData});
 
   @override
   void initState() {
@@ -211,33 +217,53 @@ class _AccreditationScreenState extends State<AccreditationScreen> {
     switch (routeName) {
       case 'Home':
         Navigator.push(
-            context, MaterialPageRoute(builder: (context) => MyHomePageOnline()));
+            context,
+            MaterialPageRoute(
+                builder: (context) =>
+                    MyHomePageOnline(userData: widget.userData)));
         break;
       case 'Accreditation':
-        Navigator.push(context,
-            MaterialPageRoute(builder: (context) => AccreditationScreen()));
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => AccreditationScreen(
+                      userData: widget.userData,
+                    )));
         break;
       case 'Leaders and Members':
         Navigator.push(
-            context, MaterialPageRoute(builder: (context) => LeadersScreen()));
+            context,
+            MaterialPageRoute(
+                builder: (context) =>
+                    LeadersScreen(userData: widget.userData)));
         break;
       case 'Household':
-        Navigator.push(context,
-            MaterialPageRoute(builder: (context) => houseHoldScreen()));
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) =>
+                    houseHoldScreen(userData: widget.userData)));
         break;
       case 'Report':
         Navigator.push(
-            context, MaterialPageRoute(builder: (context) => ReportScreen()));
+            context,
+            MaterialPageRoute(
+                builder: (context) => ReportScreen(userData: widget.userData)));
         break;
       case 'Settings':
         Navigator.push(
-            context, MaterialPageRoute(builder: (context) => SettingsScreen()));
+            context,
+            MaterialPageRoute(
+                builder: (context) =>
+                    SettingsScreen(userData: widget.userData)));
         break;
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final userData = widget.userData;
+    final userImage = AssetImage('assets/images/download.png');
     return Scaffold(
       appBar: AppBar(
         title: Text('Accreditation'),
@@ -253,64 +279,38 @@ class _AccreditationScreenState extends State<AccreditationScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     SizedBox(height: 10),
-                    FutureBuilder<Map<String, dynamic>>(
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return CircularProgressIndicator();
-                        } else if (snapshot.hasError) {
-                          return Text(
-                            'Error loading user data',
-                            style: TextStyle(color: Colors.white, fontSize: 18),
-                          );
-                        } else {
-                          // Static text
-                          final firstname = 'John';
-                          final lastname = 'Doe';
-                          final userEmail = 'john.doe@example.com';
-
-                          return Column(
-                            children: [
-                              Container(
-                                width: double.infinity,
-                                padding: EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  color: Colors.blueAccent,
-                                  borderRadius: BorderRadius.circular(8),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.3),
-                                      blurRadius: 3,
-                                      offset: Offset(0, 2),
-                                    ),
-                                  ],
-                                ),
-                                child: Column(
-                                  children: [
-                                    CircleAvatar(
-                                      backgroundColor: Colors.blueAccent[100],
-                                      radius: 30,
-                                      backgroundImage: AssetImage(
-                                          'assets/images/logo.png'), // Replace with actual user image
-                                    ),
-                                    Text(
-                                      '$firstname $lastname',
-                                      style: TextStyle(
-                                          color: Colors.white, fontSize: 20),
-                                    ),
-                                    SizedBox(height: 5),
-                                    Text(
-                                      '$userEmail',
-                                      style: TextStyle(
-                                          color: Colors.white, fontSize: 16),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          );
-                        }
-                      },
+                    Container(
+                      width: double.infinity,
+                      padding: EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Colors.blueAccent,
+                        borderRadius: BorderRadius.circular(8),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.3),
+                            blurRadius: 3,
+                            offset: Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        children: [
+                          CircleAvatar(
+                            backgroundColor: Colors.blueAccent[100],
+                            radius: 30,
+                            backgroundImage: userImage,
+                          ),
+                          Text(
+                            '${userData['user_name']}',
+                            style: TextStyle(color: Colors.white, fontSize: 20),
+                          ),
+                          SizedBox(height: 5),
+                          Text(
+                            '${userData['user_email']}',
+                            style: TextStyle(color: Colors.white, fontSize: 16),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
@@ -333,6 +333,9 @@ class _AccreditationScreenState extends State<AccreditationScreen> {
             }),
             _buildListTile('Settings', Icons.settings, 16, () {
               _navigateToScreen('Settings');
+            }),
+            _buildListTile('Logout', Icons.logout, 16, () {
+              _navigateToScreen('Logout');
             }),
           ],
         ),
@@ -377,6 +380,6 @@ class _AccreditationScreenState extends State<AccreditationScreen> {
 
 void main() {
   runApp(MaterialApp(
-    home: AccreditationScreen(),
+    home: AccreditationScreen(userData: {}),
   ));
 }

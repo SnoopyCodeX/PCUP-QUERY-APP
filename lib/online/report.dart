@@ -1,11 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:query_app/online/login.dart';
 import 'package:query_app/online/settings.dart';
-import 'package:query_app/online/accreditation.dart';
 import 'package:query_app/online/leaders_members.dart';
+import 'package:query_app/online/accreditation.dart';
 import 'package:query_app/online/household.dart';
 import 'package:query_app/online/main.dart';
 
-class ReportScreen extends StatelessWidget {
+class ReportScreen extends StatefulWidget {
+  final Map<String, dynamic> userData;
+
+  ReportScreen({required this.userData});
+
+  @override
+  _ReportScreenState createState() => _ReportScreenState();
+}
+
+class _ReportScreenState extends State<ReportScreen> {
   Widget _buildListTile(BuildContext context, String title, IconData iconData,
       double fontSize, VoidCallback onTap) {
     return Padding(
@@ -35,36 +45,61 @@ class ReportScreen extends StatelessWidget {
     switch (routeName) {
       case 'Home':
         Navigator.push(
-            context, MaterialPageRoute(builder: (context) => MyHomePageOnline()));
+            context,
+            MaterialPageRoute(
+                builder: (context) =>
+                    MyHomePageOnline(userData: widget.userData)));
         break;
       case 'Accreditation':
-        Navigator.push(context,
-            MaterialPageRoute(builder: (context) => AccreditationScreen()));
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) =>
+                    AccreditationScreen(userData: widget.userData)));
         break;
       case 'Leaders and Members':
         Navigator.push(
-            context, MaterialPageRoute(builder: (context) => LeadersScreen()));
+            context,
+            MaterialPageRoute(
+                builder: (context) =>
+                    LeadersScreen(userData: widget.userData)));
         break;
       case 'Household':
-        Navigator.push(context,
-            MaterialPageRoute(builder: (context) => houseHoldScreen()));
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) =>
+                    houseHoldScreen(userData: widget.userData)));
         break;
       case 'Report':
         Navigator.push(
-            context, MaterialPageRoute(builder: (context) => ReportScreen()));
+            context,
+            MaterialPageRoute(
+                builder: (context) => ReportScreen(userData: widget.userData)));
         break;
       case 'Settings':
         Navigator.push(
-            context, MaterialPageRoute(builder: (context) => SettingsScreen()));
+            context,
+            MaterialPageRoute(
+                builder: (context) =>
+                    SettingsScreen(userData: widget.userData)));
+        break;
+      case 'Logout':
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => LoginScreen(userData: widget.userData)));
         break;
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final userData = widget.userData;
+    final userImage = AssetImage('assets/images/download.png');
     return Scaffold(
       appBar: AppBar(
-        title: Text('Report'),
+        title: Text('Reports'),
       ),
       drawer: Drawer(
         child: ListView(
@@ -77,64 +112,38 @@ class ReportScreen extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     SizedBox(height: 10),
-                    FutureBuilder<Map<String, dynamic>>(
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return CircularProgressIndicator();
-                        } else if (snapshot.hasError) {
-                          return Text(
-                            'Error loading user data',
-                            style: TextStyle(color: Colors.white, fontSize: 18),
-                          );
-                        } else {
-                          // Static text
-                          final firstname = 'John';
-                          final lastname = 'Doe';
-                          final userEmail = 'john.doe@example.com';
-
-                          return Column(
-                            children: [
-                              Container(
-                                width: double.infinity,
-                                padding: EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  color: Colors.blueAccent,
-                                  borderRadius: BorderRadius.circular(8),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.3),
-                                      blurRadius: 3,
-                                      offset: Offset(0, 2),
-                                    ),
-                                  ],
-                                ),
-                                child: Column(
-                                  children: [
-                                    CircleAvatar(
-                                      backgroundColor: Colors.blueAccent[100],
-                                      radius: 30,
-                                      backgroundImage: AssetImage(
-                                          'assets/images/logo.png'), // Replace with actual user image
-                                    ),
-                                    Text(
-                                      '$firstname $lastname',
-                                      style: TextStyle(
-                                          color: Colors.white, fontSize: 20),
-                                    ),
-                                    SizedBox(height: 5),
-                                    Text(
-                                      '$userEmail',
-                                      style: TextStyle(
-                                          color: Colors.white, fontSize: 16),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          );
-                        }
-                      },
+                    Container(
+                      width: double.infinity,
+                      padding: EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Colors.blueAccent,
+                        borderRadius: BorderRadius.circular(8),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.3),
+                            blurRadius: 3,
+                            offset: Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        children: [
+                          CircleAvatar(
+                            backgroundColor: Colors.blueAccent[100],
+                            radius: 30,
+                            backgroundImage: userImage,
+                          ),
+                          Text(
+                            '${userData['user_name']}',
+                            style: TextStyle(color: Colors.white, fontSize: 20),
+                          ),
+                          SizedBox(height: 5),
+                          Text(
+                            '${userData['user_email']}',
+                            style: TextStyle(color: Colors.white, fontSize: 16),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
@@ -187,6 +196,14 @@ class ReportScreen extends StatelessWidget {
                 16, () {
               _navigateToScreen(
                   context, 'Settings'); // Pass context to _navigateToScreen
+            }),
+            _buildListTile(
+                context, // Pass the context
+                'Logout',
+                Icons.logout,
+                16, () {
+              _navigateToScreen(
+                  context, 'Logout'); // Pass context to _navigateToScreen
             }),
           ],
         ),

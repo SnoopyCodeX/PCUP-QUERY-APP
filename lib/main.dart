@@ -3,10 +3,17 @@ import 'package:query_app/offline/main.dart';
 import 'package:query_app/online/login.dart';
 
 void main() => runApp(MaterialApp(
-      home: FolderSelectionScreen(),
+      debugShowCheckedModeBanner: false, // Add this line
+
+      home:
+          FolderSelectionScreen(userData: {}), // Pass user data as a parameter
     ));
 
 class FolderSelectionScreen extends StatelessWidget {
+  final Map<String, dynamic> userData;
+
+  FolderSelectionScreen({required this.userData});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -19,10 +26,11 @@ class FolderSelectionScreen extends StatelessWidget {
           children: <Widget>[
             ElevatedButton(
               onPressed: () {
-                // Navigate to the "online" folder
+                // Navigate to the "online" folder and pass user data
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => LoginScreen()),
+                  MaterialPageRoute(
+                      builder: (context) => LoginScreen(userData: userData)),
                 );
               },
               child: Text('Online Folder'),
@@ -30,7 +38,7 @@ class FolderSelectionScreen extends StatelessWidget {
             SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-                // Navigate to the "offline" folder
+                // Navigate to the "offline" folder and pass user data
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => MyHomePageOffline()),
