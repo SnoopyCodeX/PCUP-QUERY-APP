@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:query_app/settings.dart';
-import 'package:query_app/report.dart';
-import 'package:query_app/leaders_members.dart';
-import 'package:query_app/household.dart';
-import 'package:query_app/main.dart';
+import 'package:query_app/online/settings.dart';
+import 'package:query_app/online/report.dart';
+import 'package:query_app/online/leaders_members.dart';
+import 'package:query_app/online/household.dart';
+import 'package:query_app/online/main.dart';
 
 class AccreditationScreen extends StatefulWidget {
   @override
@@ -28,8 +28,8 @@ class _AccreditationScreenState extends State<AccreditationScreen> {
   }
 
   Future<void> fetchAccreditations() async {
-    final Uri apiUrl =
-        Uri.parse('http://pcup-url.kesug.com/fetch_accreditations.php');
+    final Uri apiUrl = Uri.parse(
+        'http://sweet-salvador.kenkarlo.com/fetch_accreditations.php');
     try {
       final response = await http.get(apiUrl);
 
@@ -177,7 +177,8 @@ class _AccreditationScreenState extends State<AccreditationScreen> {
   }
 
   void _submitData() async {
-    final apiUrl = Uri.parse('http://pcup-url.kesug.com/add_accreditation.php');
+    final apiUrl =
+        Uri.parse('http://sweet-salvador.kenkarlo.com/add_accreditation.php');
     final response = await http.post(
       apiUrl,
       body: {
@@ -191,13 +192,17 @@ class _AccreditationScreenState extends State<AccreditationScreen> {
 
     if (response.statusCode == 200) {
       fetchAccreditations();
-      setState(() {
-        message = 'Data submitted successfully';
-      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Successfully Added'),
+        ),
+      );
     } else {
-      setState(() {
-        message = 'Failed to submit data';
-      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to submit data'),
+        ),
+      );
     }
   }
 
@@ -206,7 +211,7 @@ class _AccreditationScreenState extends State<AccreditationScreen> {
     switch (routeName) {
       case 'Home':
         Navigator.push(
-            context, MaterialPageRoute(builder: (context) => MyHomePage()));
+            context, MaterialPageRoute(builder: (context) => MyHomePageOnline()));
         break;
       case 'Accreditation':
         Navigator.push(context,

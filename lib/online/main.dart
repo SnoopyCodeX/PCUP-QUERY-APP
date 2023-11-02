@@ -1,13 +1,35 @@
 import 'package:flutter/material.dart';
-import 'package:query_app/settings.dart';
-import 'package:query_app/leaders_members.dart';
-import 'package:query_app/household.dart';
-import 'package:query_app/main.dart';
-import 'package:query_app/accreditation.dart';
+import 'package:query_app/online/settings.dart';
+import 'package:query_app/online/accreditation.dart';
+import 'package:query_app/online/report.dart';
+import 'package:query_app/online/leaders_members.dart';
+import 'package:query_app/online/household.dart';
 
-class ReportScreen extends StatelessWidget {
-  Widget _buildListTile(BuildContext context, String title, IconData iconData,
-      double fontSize, VoidCallback onTap) {
+void main() {
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false, // Set this property to false
+
+      home: MyHomePageOnline(),
+    );
+  }
+}
+
+class MyHomePageOnline extends StatefulWidget {
+  @override
+  _MyHomePageState createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePageOnline> {
+  int _selectedIndex = 0;
+
+  Widget _buildListTile(
+      String title, IconData iconData, double fontSize, VoidCallback onTap) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
       child: Card(
@@ -30,12 +52,19 @@ class ReportScreen extends StatelessWidget {
     );
   }
 
-  void _navigateToScreen(BuildContext context, String routeName) {
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+      Navigator.pop(context); // Close the sidebar
+    });
+  }
+
+  void _navigateToScreen(String routeName) {
     Navigator.of(context).pop(); // Close the sidebar
     switch (routeName) {
       case 'Home':
-        Navigator.push(
-            context, MaterialPageRoute(builder: (context) => MyHomePage()));
+        Navigator.push(context,
+            MaterialPageRoute(builder: (context) => MyHomePageOnline()));
         break;
       case 'Accreditation':
         Navigator.push(context,
@@ -64,7 +93,7 @@ class ReportScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Report'),
+        title: Text('Home Screen'),
       ),
       drawer: Drawer(
         child: ListView(
@@ -140,59 +169,26 @@ class ReportScreen extends StatelessWidget {
                 ),
               ),
             ),
-            _buildListTile(
-                context, // Pass the context
-                'Home',
-                Icons.home,
-                16, () {
-              _navigateToScreen(
-                  context, 'Home'); // Pass context to _navigateToScreen
+            _buildListTile('Home', Icons.home, 16, () {
+              _navigateToScreen('Home');
             }),
-            _buildListTile(
-                context, // Pass the context
-                'Accreditation',
-                Icons.verified_user,
-                16, () {
-              _navigateToScreen(context,
-                  'Accreditation'); // Pass context to _navigateToScreen
+            _buildListTile('Accreditation', Icons.verified_user, 16, () {
+              _navigateToScreen('Accreditation');
             }),
-            _buildListTile(
-                context, // Pass the context
-                'Leaders and Members',
-                Icons.group,
-                16, () {
-              _navigateToScreen(context,
-                  'Leaders and Members'); // Pass context to _navigateToScreen
+            _buildListTile('Leaders and Members', Icons.group, 16, () {
+              _navigateToScreen('Leaders and Members');
             }),
-            _buildListTile(
-                context, // Pass the context
-                'Household',
-                Icons.home_work,
-                16, () {
-              _navigateToScreen(
-                  context, 'Household'); // Pass context to _navigateToScreen
+            _buildListTile('Household', Icons.home_work, 16, () {
+              _navigateToScreen('Household');
             }),
-            _buildListTile(
-                context, // Pass the context
-                'Report',
-                Icons.list_alt_rounded,
-                16, () {
-              _navigateToScreen(
-                  context, 'Report'); // Pass context to _navigateToScreen
+            _buildListTile('Report', Icons.list_alt_rounded, 16, () {
+              _navigateToScreen('Report');
             }),
-            _buildListTile(
-                context, // Pass the context
-                'Settings',
-                Icons.settings,
-                16, () {
-              _navigateToScreen(
-                  context, 'Settings'); // Pass context to _navigateToScreen
+            _buildListTile('Settings', Icons.settings, 16, () {
+              _navigateToScreen('Settings');
             }),
           ],
         ),
-      ),
-      body: Center(
-        child: Text('Report Screen Content'),
       ),
     );
   }

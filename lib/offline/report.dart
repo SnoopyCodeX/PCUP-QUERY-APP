@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:query_app/report.dart';
-import 'package:query_app/leaders_members.dart';
-import 'package:query_app/household.dart';
-import 'package:query_app/main.dart';
-import 'package:query_app/accreditation.dart';
+import 'package:query_app/offline/settings.dart';
+import 'package:query_app/offline/accreditation.dart';
+import 'package:query_app/offline/leaders_members.dart';
+import 'package:query_app/offline/household.dart';
+import 'package:query_app/offline/main.dart';
 
-class SettingsScreen extends StatelessWidget {
+class ReportScreen extends StatelessWidget {
   Widget _buildListTile(BuildContext context, String title, IconData iconData,
       double fontSize, VoidCallback onTap) {
     return Padding(
@@ -35,7 +35,7 @@ class SettingsScreen extends StatelessWidget {
     switch (routeName) {
       case 'Home':
         Navigator.push(
-            context, MaterialPageRoute(builder: (context) => MyHomePage()));
+            context, MaterialPageRoute(builder: (context) => MyHomePageOffline()));
         break;
       case 'Accreditation':
         Navigator.push(context,
@@ -64,7 +64,7 @@ class SettingsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Settings'),
+        title: Text('Report'),
       ),
       drawer: Drawer(
         child: ListView(
@@ -192,7 +192,7 @@ class SettingsScreen extends StatelessWidget {
         ),
       ),
       body: Center(
-        child: Text('Settings Screen Content'),
+        child: Text('Report Screen Content'),
       ),
     );
   }
