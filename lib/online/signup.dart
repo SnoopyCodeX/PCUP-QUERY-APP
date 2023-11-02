@@ -11,6 +11,7 @@ class SignUpScreen extends StatefulWidget {
 class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
+  final TextEditingController fullnameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
 
@@ -60,6 +61,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     ),
                     SizedBox(height: 20),
                     TextFormField(
+                      controller: fullnameController,
+                      decoration: InputDecoration(
+                        labelText: 'Fullname',
+                        border: OutlineInputBorder(),
+                      ),
+                      obscureText: true,
+                    ),
+                    SizedBox(height: 20),
+                    TextFormField(
                       controller: emailController,
                       decoration: InputDecoration(
                         labelText: 'Email',
@@ -79,6 +89,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       onPressed: () async {
                         String username = usernameController.text;
                         String password = passwordController.text;
+                        String fullname = fullnameController.text;
                         String email = emailController.text;
                         String phone = phoneController.text;
 
@@ -88,6 +99,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           body: {
                             'user_name': username,
                             'user_password': password,
+                            'user_fullname': fullname,
                             'user_email': email,
                             'user_phone': phone,
                           },

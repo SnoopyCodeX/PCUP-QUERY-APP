@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:query_app/offline/settings.dart';
-import 'package:query_app/offline/accreditation.dart';
 import 'package:query_app/offline/report.dart';
 import 'package:query_app/offline/leaders_members.dart';
+import 'package:query_app/offline/accreditation.dart';
 import 'package:query_app/offline/household.dart';
+import 'package:query_app/main.dart';
 
 void main() {
   runApp(MyApp());
@@ -13,19 +14,26 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false, // Set this property to false
-
-      home: MyHomePageOffline(),
+      debugShowCheckedModeBanner: false,
+      home: MyHomePageOffline(userData: {}), // Initialize with an empty map
     );
   }
 }
 
 class MyHomePageOffline extends StatefulWidget {
+  final Map<String, dynamic> userData;
+
+  MyHomePageOffline({required this.userData});
+
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  _MyHomePageState createState() => _MyHomePageState(userData: userData);
 }
 
 class _MyHomePageState extends State<MyHomePageOffline> {
+  final Map<String, dynamic> userData;
+
+  _MyHomePageState({required this.userData});
+
   int _selectedIndex = 0;
 
   Widget _buildListTile(
@@ -55,42 +63,64 @@ class _MyHomePageState extends State<MyHomePageOffline> {
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
-      Navigator.pop(context); // Close the sidebar
+      Navigator.pop(context);
     });
   }
 
   void _navigateToScreen(String routeName) {
-    Navigator.of(context).pop(); // Close the sidebar
+    Navigator.of(context).pop();
     switch (routeName) {
       case 'Home':
-        Navigator.push(context,
-            MaterialPageRoute(builder: (context) => MyHomePageOffline()));
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => MyHomePageOffline(userData: userData)));
         break;
       case 'Accreditation':
-        Navigator.push(context,
-            MaterialPageRoute(builder: (context) => AccreditationScreen()));
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => AccreditationScreen(userData: userData)));
         break;
       case 'Leaders and Members':
         Navigator.push(
-            context, MaterialPageRoute(builder: (context) => LeadersScreen()));
+            context,
+            MaterialPageRoute(
+                builder: (context) => LeadersScreen(userData: userData)));
         break;
       case 'Household':
-        Navigator.push(context,
-            MaterialPageRoute(builder: (context) => houseHoldScreen()));
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => houseHoldScreen(userData: userData)));
         break;
       case 'Report':
         Navigator.push(
-            context, MaterialPageRoute(builder: (context) => ReportScreen()));
+            context,
+            MaterialPageRoute(
+                builder: (context) => ReportScreen(userData: userData)));
         break;
       case 'Settings':
         Navigator.push(
-            context, MaterialPageRoute(builder: (context) => SettingsScreen()));
+            context,
+            MaterialPageRoute(
+                builder: (context) => SettingsScreen(userData: userData)));
+        break;
+      case 'Back':
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) =>
+                    FolderSelectionScreen(userData: userData)));
         break;
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final userData = widget.userData;
+    final userImage = AssetImage('assets/images/avatar.png');
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Home Screen'),
@@ -186,6 +216,9 @@ class _MyHomePageState extends State<MyHomePageOffline> {
             }),
             _buildListTile('Settings', Icons.settings, 16, () {
               _navigateToScreen('Settings');
+            }),
+            _buildListTile('Back', Icons.logout_rounded, 16, () {
+              _navigateToScreen('Back');
             }),
           ],
         ),

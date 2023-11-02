@@ -19,6 +19,8 @@ class FolderSelectionScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('Folder Selection'),
+
+        automaticallyImplyLeading: false, // Add this line
       ),
       body: Center(
         child: Column(
@@ -41,7 +43,9 @@ class FolderSelectionScreen extends StatelessWidget {
                 // Navigate to the "offline" folder and pass user data
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => MyHomePageOffline()),
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          MyHomePageOffline(userData: userData)),
                 );
               },
               child: Text('Offline Folder'),

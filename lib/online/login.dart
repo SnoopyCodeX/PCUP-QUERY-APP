@@ -24,7 +24,8 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
+      body: ListView(
+        // Use a ListView to make the content scrollable
         children: [
           Container(
             margin: EdgeInsets.only(top: 170, bottom: 20), // Add top margin
@@ -81,6 +82,11 @@ class _LoginScreenState extends State<LoginScreen> {
                         body: json.encode(
                             {'user_name': username, 'user_password': password}),
                       );
+                      print(response.body);
+                      String responseBody =
+                          response.body; // Extract the response body
+                      String errorMessage =
+                          ''; // Initialize the error message variable
 
                       if (response.statusCode == 200) {
                         var data = json.decode(response.body);
@@ -89,16 +95,43 @@ class _LoginScreenState extends State<LoginScreen> {
                           // User is logged in; store user data and navigate to the main screen
                           Map<String, dynamic> userData =
                               data; // Store user data
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  MyHomePageOnline(userData: userData),
+                          if (userData['user_remarks'] == 'APPROVED') {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Successfuly Login'),
+                                duration: Duration(seconds: 3),
+                              ),
+                            );
+
+                            // Delay the navigation to the login screen for 5 seconds
+                            Future.delayed(Duration(seconds: 3), () {
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      MyHomePageOnline(userData: userData),
+                                ),
+                              );
+                            });
+                          } else if (responseBody
+                              .contains('Login failed. User not approved.')) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content:
+                                    Text("Login failed. User not approved."),
+                                duration: Duration(seconds: 2),
+                              ),
+                            );
+                          }
+                        } else if (responseBody
+                            .contains('Login failed. Invalid credentials.')) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content:
+                                  Text("Login failed. Invalid credentials."),
+                              duration: Duration(seconds: 2),
                             ),
                           );
-                        } else {
-                          // Handle login failure (e.g., show an error message)
-                          print("Login failed. Invalid credentials.");
                         }
                       } else {
                         // Handle the API response status code (e.g., show an error message)

@@ -1,11 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:query_app/offline/accreditation.dart';
 import 'package:query_app/offline/report.dart';
-import 'package:query_app/offline/leaders_members.dart';
+import 'package:query_app/offline/accreditation.dart';
 import 'package:query_app/offline/household.dart';
 import 'package:query_app/offline/main.dart';
+import 'package:query_app/offline/leaders_members.dart';
+import 'package:query_app/main.dart';
 
-class SettingsScreen extends StatelessWidget {
+class SettingsScreen extends StatefulWidget {
+  final Map<String, dynamic> userData;
+
+  SettingsScreen({required this.userData});
+
+  @override
+  _SettingsScreenState createState() => _SettingsScreenState();
+}
+
+class _SettingsScreenState extends State<SettingsScreen> {
+  // Change ReportScreen to SettingsScreen
+
   Widget _buildListTile(BuildContext context, String title, IconData iconData,
       double fontSize, VoidCallback onTap) {
     return Padding(
@@ -34,34 +46,60 @@ class SettingsScreen extends StatelessWidget {
     Navigator.of(context).pop(); // Close the sidebar
     switch (routeName) {
       case 'Home':
-        Navigator.push(context,
-            MaterialPageRoute(builder: (context) => MyHomePageOffline()));
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) =>
+                    MyHomePageOffline(userData: widget.userData)));
         break;
       case 'Accreditation':
-        Navigator.push(context,
-            MaterialPageRoute(builder: (context) => AccreditationScreen()));
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) =>
+                    AccreditationScreen(userData: widget.userData)));
         break;
       case 'Leaders and Members':
         Navigator.push(
-            context, MaterialPageRoute(builder: (context) => LeadersScreen()));
+            context,
+            MaterialPageRoute(
+                builder: (context) =>
+                    LeadersScreen(userData: widget.userData)));
         break;
       case 'Household':
-        Navigator.push(context,
-            MaterialPageRoute(builder: (context) => houseHoldScreen()));
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) =>
+                    houseHoldScreen(userData: widget.userData)));
         break;
       case 'Report':
         Navigator.push(
-            context, MaterialPageRoute(builder: (context) => ReportScreen()));
+            context,
+            MaterialPageRoute(
+                builder: (context) => ReportScreen(userData: widget.userData)));
         break;
       case 'Settings':
         Navigator.push(
-            context, MaterialPageRoute(builder: (context) => SettingsScreen()));
+            context,
+            MaterialPageRoute(
+                builder: (context) =>
+                    SettingsScreen(userData: widget.userData)));
+        break;
+      case 'Back':
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) =>
+                    FolderSelectionScreen(userData: widget.userData)));
         break;
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final userData = widget.userData;
+    final userImage = AssetImage('assets/images/avatar.png');
     return Scaffold(
       appBar: AppBar(
         title: Text('Settings'),
@@ -187,6 +225,14 @@ class SettingsScreen extends StatelessWidget {
                 16, () {
               _navigateToScreen(
                   context, 'Settings'); // Pass context to _navigateToScreen
+            }),
+            _buildListTile(
+                context, // Pass the context
+                'Back',
+                Icons.logout_rounded,
+                16, () {
+              _navigateToScreen(
+                  context, 'Back'); // Pass context to _navigateToScreen
             }),
           ],
         ),

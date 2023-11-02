@@ -6,13 +6,19 @@ import 'package:query_app/offline/report.dart';
 import 'package:query_app/offline/leaders_members.dart';
 import 'package:query_app/offline/household.dart';
 import 'package:query_app/offline/main.dart';
+import 'package:query_app/main.dart';
 
 class AccreditationScreen extends StatefulWidget {
+  final Map<String, dynamic> userData;
+
+  AccreditationScreen({required this.userData});
   @override
-  _AccreditationScreenState createState() => _AccreditationScreenState();
+  _AccreditationScreenState createState() =>
+      _AccreditationScreenState(userData: userData);
 }
 
 class _AccreditationScreenState extends State<AccreditationScreen> {
+  final Map<String, dynamic> userData;
   List<Map<String, dynamic>> accreditations = [];
   String message = '';
   TextEditingController nameController = TextEditingController();
@@ -20,6 +26,7 @@ class _AccreditationScreenState extends State<AccreditationScreen> {
   TextEditingController presidentController = TextEditingController();
   TextEditingController contactController = TextEditingController();
   TextEditingController sexController = TextEditingController();
+  _AccreditationScreenState({required this.userData});
 
   @override
   void initState() {
@@ -29,7 +36,7 @@ class _AccreditationScreenState extends State<AccreditationScreen> {
 
   Future<void> fetchAccreditations() async {
     final Uri apiUrl = Uri.parse(
-        'http://192.168.254.159:8080/pcup-api/fetch_accreditations.php');
+        'http://sweet-salvador.kenkarlo.com/fetch_accreditations.php');
     try {
       final response = await http.get(apiUrl);
 
@@ -178,7 +185,7 @@ class _AccreditationScreenState extends State<AccreditationScreen> {
 
   void _submitData() async {
     final apiUrl =
-        Uri.parse('http://192.168.254.159:8080/pcup-api/add_accreditation.php');
+        Uri.parse('http://sweet-salvador.kenkarlo.com/add_accreditation.php');
     final response = await http.post(
       apiUrl,
       body: {
@@ -210,34 +217,61 @@ class _AccreditationScreenState extends State<AccreditationScreen> {
     Navigator.of(context).pop(); // Close the sidebar
     switch (routeName) {
       case 'Home':
-        Navigator.push(context,
-            MaterialPageRoute(builder: (context) => MyHomePageOffline()));
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) =>
+                    MyHomePageOffline(userData: widget.userData)));
         break;
       case 'Accreditation':
-        Navigator.push(context,
-            MaterialPageRoute(builder: (context) => AccreditationScreen()));
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => AccreditationScreen(
+                      userData: widget.userData,
+                    )));
         break;
       case 'Leaders and Members':
         Navigator.push(
-            context, MaterialPageRoute(builder: (context) => LeadersScreen()));
+            context,
+            MaterialPageRoute(
+                builder: (context) =>
+                    LeadersScreen(userData: widget.userData)));
         break;
       case 'Household':
-        Navigator.push(context,
-            MaterialPageRoute(builder: (context) => houseHoldScreen()));
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) =>
+                    houseHoldScreen(userData: widget.userData)));
         break;
       case 'Report':
         Navigator.push(
-            context, MaterialPageRoute(builder: (context) => ReportScreen()));
+            context,
+            MaterialPageRoute(
+                builder: (context) => ReportScreen(userData: widget.userData)));
         break;
       case 'Settings':
         Navigator.push(
-            context, MaterialPageRoute(builder: (context) => SettingsScreen()));
+            context,
+            MaterialPageRoute(
+                builder: (context) =>
+                    SettingsScreen(userData: widget.userData)));
+        break;
+      case 'Back':
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) =>
+                    FolderSelectionScreen(userData: widget.userData)));
         break;
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final userData = widget.userData;
+    final userImage = AssetImage('assets/images/avatar.png');
     return Scaffold(
       appBar: AppBar(
         title: Text('Accreditation'),
@@ -334,6 +368,9 @@ class _AccreditationScreenState extends State<AccreditationScreen> {
             _buildListTile('Settings', Icons.settings, 16, () {
               _navigateToScreen('Settings');
             }),
+            _buildListTile('Back', Icons.logout_rounded, 16, () {
+              _navigateToScreen('Back');
+            }),
           ],
         ),
       ),
@@ -377,6 +414,6 @@ class _AccreditationScreenState extends State<AccreditationScreen> {
 
 void main() {
   runApp(MaterialApp(
-    home: AccreditationScreen(),
+    home: AccreditationScreen(userData: {}),
   ));
 }
