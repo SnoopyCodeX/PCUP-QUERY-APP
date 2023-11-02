@@ -98,7 +98,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     final userData = widget.userData;
-    final userImage = AssetImage('assets/images/download.png');
+    final userImage = AssetImage('assets/images/avatar.png');
     return Scaffold(
       appBar: AppBar(
         title: Text('Settings'),
@@ -131,7 +131,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       child: Column(
                         children: [
                           CircleAvatar(
-                            backgroundColor: Colors.blueAccent[100],
                             radius: 30,
                             backgroundImage: userImage,
                           ),

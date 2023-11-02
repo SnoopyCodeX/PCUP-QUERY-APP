@@ -96,7 +96,7 @@ class _ReportScreenState extends State<ReportScreen> {
   @override
   Widget build(BuildContext context) {
     final userData = widget.userData;
-    final userImage = AssetImage('assets/images/download.png');
+    final userImage = AssetImage('assets/images/avatar.png');
     return Scaffold(
       appBar: AppBar(
         title: Text('Reports'),
@@ -129,7 +129,7 @@ class _ReportScreenState extends State<ReportScreen> {
                       child: Column(
                         children: [
                           CircleAvatar(
-                            backgroundColor: Colors.blueAccent[100],
+                      
                             radius: 30,
                             backgroundImage: userImage,
                           ),

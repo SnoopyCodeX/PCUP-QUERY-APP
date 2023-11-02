@@ -96,7 +96,7 @@ class _houseHoldScreenState extends State<houseHoldScreen> {
   @override
   Widget build(BuildContext context) {
     final userData = widget.userData;
-    final userImage = AssetImage('assets/images/download.png');
+    final userImage = AssetImage('assets/images/avatar.png');
     return Scaffold(
       appBar: AppBar(
         title: Text('Household'),
@@ -129,7 +129,6 @@ class _houseHoldScreenState extends State<houseHoldScreen> {
                       child: Column(
                         children: [
                           CircleAvatar(
-                            backgroundColor: Colors.blueAccent[100],
                             radius: 30,
                             backgroundImage: userImage,
                           ),

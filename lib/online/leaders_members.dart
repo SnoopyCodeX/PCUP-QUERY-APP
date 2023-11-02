@@ -96,7 +96,7 @@ class _LeadersScreenState extends State<LeadersScreen> {
   @override
   Widget build(BuildContext context) {
     final userData = widget.userData;
-    final userImage = AssetImage('assets/images/download.png');
+    final userImage = AssetImage('assets/images/avatar.png');
     return Scaffold(
       appBar: AppBar(
         title: Text('Leaders and Members'),
@@ -129,7 +129,6 @@ class _LeadersScreenState extends State<LeadersScreen> {
                       child: Column(
                         children: [
                           CircleAvatar(
-                            backgroundColor: Colors.blueAccent[100],
                             radius: 30,
                             backgroundImage: userImage,
                           ),

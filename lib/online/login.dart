@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:query_app/online/main.dart';
+import 'package:query_app/online/signup.dart'; // Import the signup screen file
 
 void main() => runApp(MaterialApp(
       home: LoginScreen(userData: {}),
@@ -23,10 +24,19 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Card(
+      body: Column(
+        children: [
+          Container(
+            margin: EdgeInsets.only(top: 170, bottom: 20), // Add top margin
+            child: Center(
+              child: CircleAvatar(
+                radius: 50,
+                backgroundImage: AssetImage('assets/images/download.png'),
+                // Provide the path to your image asset
+              ),
+            ),
+          ),
+          Card(
             elevation: 5,
             child: Padding(
               padding: const EdgeInsets.all(16.0),
@@ -98,11 +108,23 @@ class _LoginScreenState extends State<LoginScreen> {
                     },
                     child: Text('Login'),
                   ),
+                  TextButton(
+                    onPressed: () {
+                      // Navigate to the sign-up screen when the "Sign Up" button is pressed
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => SignUpScreen(),
+                        ),
+                      );
+                    },
+                    child: Text('Sign Up'),
+                  ),
                 ],
               ),
             ),
           ),
-        ),
+        ],
       ),
     );
   }

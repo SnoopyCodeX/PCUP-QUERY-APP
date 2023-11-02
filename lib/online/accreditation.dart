@@ -263,7 +263,7 @@ class _AccreditationScreenState extends State<AccreditationScreen> {
   @override
   Widget build(BuildContext context) {
     final userData = widget.userData;
-    final userImage = AssetImage('assets/images/download.png');
+    final userImage = AssetImage('assets/images/avatar.png');
     return Scaffold(
       appBar: AppBar(
         title: Text('Accreditation'),
@@ -296,7 +296,6 @@ class _AccreditationScreenState extends State<AccreditationScreen> {
                       child: Column(
                         children: [
                           CircleAvatar(
-                            backgroundColor: Colors.blueAccent[100],
                             radius: 30,
                             backgroundImage: userImage,
                           ),
