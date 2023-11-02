@@ -13,6 +13,8 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false, // Set this property to false
+
       home: MyHomePage(),
     );
   }
@@ -91,7 +93,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Sidebar Example'),
+        title: Text('Home Screen'),
       ),
       drawer: Drawer(
         child: ListView(
