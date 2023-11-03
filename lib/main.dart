@@ -3,10 +3,8 @@ import 'package:query_app/offline/main.dart';
 import 'package:query_app/online/login.dart';
 
 void main() => runApp(MaterialApp(
-      debugShowCheckedModeBanner: false, // Add this line
-
-      home:
-          FolderSelectionScreen(userData: {}), // Pass user data as a parameter
+      debugShowCheckedModeBanner: false,
+      home: FolderSelectionScreen(userData: {}),
     ));
 
 class FolderSelectionScreen extends StatelessWidget {
@@ -14,13 +12,68 @@ class FolderSelectionScreen extends StatelessWidget {
 
   FolderSelectionScreen({required this.userData});
 
+  void navigateToOnlineScreen(BuildContext context) {
+    // Show a loading message using SnackBar
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: <Widget>[
+            CircularProgressIndicator(), // Circular loader
+            SizedBox(width: 16),
+            Text("Loading..."),
+          ],
+        ),
+        duration: Duration(seconds: 1), // You can adjust the duration
+      ),
+    );
+
+    // Simulate a delay for 2 seconds before navigating to the "Online" screen
+    Future.delayed(Duration(seconds: 2), () {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => LoginScreen(
+            userData: userData,
+          ),
+        ),
+      );
+    });
+  }
+
+  void navigateToOfflineScreen(BuildContext context) {
+    // Show a loading message using SnackBar
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: <Widget>[
+            CircularProgressIndicator(), // Circular loader
+            SizedBox(width: 16),
+            Text("Loading..."),
+          ],
+        ),
+        duration: Duration(seconds: 1), // You can adjust the duration
+      ),
+    );
+
+    // Simulate a delay for 2 seconds before navigating to the "Online" screen
+    Future.delayed(Duration(seconds: 2), () {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => MyHomePageOffline(
+            userData: userData,
+          ),
+        ),
+      );
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Folder Selection'),
-
-        automaticallyImplyLeading: false, // Add this line
+        title: Text('Choices'),
+        automaticallyImplyLeading: false,
       ),
       body: Center(
         child: Column(
@@ -28,27 +81,16 @@ class FolderSelectionScreen extends StatelessWidget {
           children: <Widget>[
             ElevatedButton(
               onPressed: () {
-                // Navigate to the "online" folder and pass user data
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => LoginScreen(userData: userData)),
-                );
+                navigateToOnlineScreen(context);
               },
-              child: Text('Online Folder'),
+              child: Text('Online'),
             ),
             SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-                // Navigate to the "offline" folder and pass user data
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) =>
-                          MyHomePageOffline(userData: userData)),
-                );
+                navigateToOfflineScreen(context);
               },
-              child: Text('Offline Folder'),
+              child: Text('Offline'),
             ),
           ],
         ),

@@ -36,7 +36,7 @@ class _AccreditationScreenState extends State<AccreditationScreen> {
 
   Future<void> fetchAccreditations() async {
     final Uri apiUrl = Uri.parse(
-        'http://sweet-salvador.kenkarlo.com/fetch_accreditations.php');
+        'http://192.168.254.159:8080/pcup-api/fetch_accreditations.php');
     try {
       final response = await http.get(apiUrl);
 
@@ -185,7 +185,7 @@ class _AccreditationScreenState extends State<AccreditationScreen> {
 
   void _submitData() async {
     final apiUrl =
-        Uri.parse('http://sweet-salvador.kenkarlo.com/add_accreditation.php');
+        Uri.parse('http://192.168.254.159:8080/pcup-api/add_accreditation.php');
     final response = await http.post(
       apiUrl,
       body: {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:query_app/online/login.dart';
 import 'dart:convert';
 import 'package:query_app/online/settings.dart';
 import 'package:query_app/online/report.dart';
@@ -35,7 +36,7 @@ class _AccreditationScreenState extends State<AccreditationScreen> {
 
   Future<void> fetchAccreditations() async {
     final Uri apiUrl = Uri.parse(
-        'http://sweet-salvador.kenkarlo.com/fetch_accreditations.php');
+        'http://192.168.254.159:8080/pcup-api/fetch_accreditations.php');
     try {
       final response = await http.get(apiUrl);
 
@@ -184,7 +185,7 @@ class _AccreditationScreenState extends State<AccreditationScreen> {
 
   void _submitData() async {
     final apiUrl =
-        Uri.parse('http://sweet-salvador.kenkarlo.com/add_accreditation.php');
+        Uri.parse('http://192.168.254.159:8080/pcup-api/add_accreditation.php');
     final response = await http.post(
       apiUrl,
       body: {
@@ -256,6 +257,12 @@ class _AccreditationScreenState extends State<AccreditationScreen> {
             MaterialPageRoute(
                 builder: (context) =>
                     SettingsScreen(userData: widget.userData)));
+        break;
+      case 'Logout':
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => LoginScreen(userData: widget.userData)));
         break;
     }
   }
