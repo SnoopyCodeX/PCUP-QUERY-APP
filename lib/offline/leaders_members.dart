@@ -358,10 +358,9 @@ class _LeadersScreenState extends State<LeadersScreen> {
   @override
   Widget build(BuildContext context) {
     final userData = widget.userData;
-    final userImage = AssetImage('assets/images/avatar.png');
     return Scaffold(
       appBar: AppBar(
-        title: Text('Leaders and Members'),
+        title: Text('Home Screen'),
       ),
       drawer: Drawer(
         child: ListView(
@@ -374,37 +373,64 @@ class _LeadersScreenState extends State<LeadersScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     SizedBox(height: 10),
-                    Container(
-                      width: double.infinity,
-                      padding: EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: Colors.blueAccent,
-                        borderRadius: BorderRadius.circular(8),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.3),
-                            blurRadius: 3,
-                            offset: Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        children: [
-                          CircleAvatar(
-                            radius: 30,
-                            backgroundImage: userImage,
-                          ),
-                          Text(
-                            '${userData['user_name']}',
-                            style: TextStyle(color: Colors.white, fontSize: 20),
-                          ),
-                          SizedBox(height: 5),
-                          Text(
-                            '${userData['user_email']}',
-                            style: TextStyle(color: Colors.white, fontSize: 16),
-                          ),
-                        ],
-                      ),
+                    FutureBuilder<Map<String, dynamic>>(
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return CircularProgressIndicator();
+                        } else if (snapshot.hasError) {
+                          return Text(
+                            'Error loading user data',
+                            style: TextStyle(color: Colors.white, fontSize: 18),
+                          );
+                        } else {
+                          // Static text
+                          final firstname = 'John';
+                          final lastname = 'Doe';
+                          final userEmail = 'john.doe@example.com';
+
+                          return Column(
+                            children: [
+                              Container(
+                                width: double.infinity,
+                                padding: EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                  color: Colors.blueAccent,
+                                  borderRadius: BorderRadius.circular(8),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.3),
+                                      blurRadius: 3,
+                                      offset: Offset(0, 2),
+                                    ),
+                                  ],
+                                ),
+                                child: Column(
+                                  children: [
+                                    CircleAvatar(
+                                      backgroundColor: Colors.blueAccent[100],
+                                      radius: 30,
+                                      backgroundImage: AssetImage(
+                                          'assets/images/avatar.png'), // Replace with actual user image
+                                    ),
+                                    Text(
+                                      '$firstname $lastname',
+                                      style: TextStyle(
+                                          color: Colors.white, fontSize: 20),
+                                    ),
+                                    SizedBox(height: 5),
+                                    Text(
+                                      '$userEmail',
+                                      style: TextStyle(
+                                          color: Colors.white, fontSize: 16),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          );
+                        }
+                      },
                     ),
                   ],
                 ),

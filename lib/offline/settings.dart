@@ -99,10 +99,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     final userData = widget.userData;
-    final userImage = AssetImage('assets/images/avatar.png');
     return Scaffold(
       appBar: AppBar(
-        title: Text('Settings'),
+        title: Text('Home Screen'),
       ),
       drawer: Drawer(
         child: ListView(
@@ -153,7 +152,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                       backgroundColor: Colors.blueAccent[100],
                                       radius: 30,
                                       backgroundImage: AssetImage(
-                                          'assets/images/logo.png'), // Replace with actual user image
+                                          'assets/images/avatar.png'), // Replace with actual user image
                                     ),
                                     Text(
                                       '$firstname $lastname',
