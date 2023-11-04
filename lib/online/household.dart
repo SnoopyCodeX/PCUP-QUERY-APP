@@ -167,7 +167,8 @@ class _houseHoldScreenState extends State<houseHoldScreen> {
         Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => FolderSelectionScreen(userData: widget.userData)));
+                builder: (context) =>
+                    FolderSelectionScreen(userData: widget.userData)));
         break;
     }
   }
@@ -256,6 +257,8 @@ class _houseHoldScreenState extends State<houseHoldScreen> {
     }
   }
 
+  String? selectedSuffix;
+  String? selectedSex;
   void _showInsertDataDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -278,9 +281,30 @@ class _houseHoldScreenState extends State<houseHoldScreen> {
                   decoration:
                       InputDecoration(labelText: 'Household MiddleName'),
                 ),
-                TextFormField(
-                  controller: hourseholdSuffixController,
+                DropdownButtonFormField<String>(
                   decoration: InputDecoration(labelText: 'Household Suffix'),
+                  value: selectedSuffix,
+                  items: [
+                    DropdownMenuItem(
+                      value: 'JR.',
+                      child: Text('JR.'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'SR.',
+                      child: Text('SR.'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'III.',
+                      child: Text('III.'),
+                    ),
+                  ],
+                  onChanged: (selectedItem) {
+                    setState(() {
+                      selectedSuffix = selectedItem;
+                      hourseholdSuffixController.text =
+                          selectedItem!; // Update leaderPositionController
+                    });
+                  },
                 ),
                 TextFormField(
                   controller: householdBirthdateController,
@@ -290,9 +314,26 @@ class _houseHoldScreenState extends State<houseHoldScreen> {
                   controller: householdAgeController,
                   decoration: InputDecoration(labelText: 'Household Age'),
                 ),
-                TextFormField(
-                  controller: householdSexController,
+                DropdownButtonFormField<String>(
                   decoration: InputDecoration(labelText: 'Household Sex'),
+                  value: selectedSex,
+                  items: [
+                    DropdownMenuItem(
+                      value: 'Male',
+                      child: Text('Male'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'Female',
+                      child: Text('Female'),
+                    ),
+                  ],
+                  onChanged: (selectedItem) {
+                    setState(() {
+                      selectedSex = selectedItem;
+                      householdSexController.text =
+                          selectedItem!; // Update leaderPositionController
+                    });
+                  },
                 ),
                 TextFormField(
                   controller: pregnantController,
@@ -488,7 +529,7 @@ class _houseHoldScreenState extends State<houseHoldScreen> {
         scrollDirection: Axis.vertical,
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
-          child: DataTable(
+          /*       child: DataTable(
             columns: <DataColumn>[
               DataColumn(label: Text('Household LastName')),
               DataColumn(label: Text('Household FirstName')),
@@ -546,7 +587,7 @@ class _houseHoldScreenState extends State<houseHoldScreen> {
                   ),
                 )
                 .toList(),
-          ),
+          ), */
         ),
       ),
       floatingActionButton: Column(

@@ -378,7 +378,7 @@ class _AccreditationScreenState extends State<AccreditationScreen> {
         scrollDirection: Axis.vertical,
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
-          child: DataTable(
+          /*   child: DataTable(
             columns: <DataColumn>[
               DataColumn(label: Text('Name')),
               DataColumn(label: Text('Address')),
@@ -399,7 +399,7 @@ class _AccreditationScreenState extends State<AccreditationScreen> {
                   ),
                 )
                 .toList(),
-          ),
+          ), */
         ),
       ),
       floatingActionButton: Column(

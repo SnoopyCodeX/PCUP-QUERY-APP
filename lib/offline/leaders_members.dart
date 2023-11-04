@@ -598,7 +598,7 @@ class _LeadersScreenState extends State<LeadersScreen> {
         scrollDirection: Axis.vertical,
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
-          child: DataTable(
+          /*        child: DataTable(
             columns: <DataColumn>[
               DataColumn(label: Text('Leader Name')),
               DataColumn(label: Text('Leader Position')),
@@ -656,7 +656,7 @@ class _LeadersScreenState extends State<LeadersScreen> {
                   ),
                 )
                 .toList(),
-          ),
+          ), */
         ),
       ),
       floatingActionButton: Column(

@@ -542,31 +542,6 @@ class _ReportScreenState extends State<ReportScreen> {
         scrollDirection: Axis.vertical,
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
-          child: DataTable(
-            columns: <DataColumn>[
-              DataColumn(label: Text('Program Head')),
-              DataColumn(label: Text('Facilitator')),
-              DataColumn(label: Text('Schedule Date')),
-              DataColumn(label: Text('Barangay')),
-              DataColumn(label: Text('Description')),
-            ],
-            rows: reports
-                .map(
-                  (accreditation) => DataRow(
-                    cells: <DataCell>[
-                      DataCell(Text(accreditation['report_name'].toString())),
-                      DataCell(
-                          Text(accreditation['report_facilitator'].toString())),
-                      DataCell(Text(accreditation['report_date'].toString())),
-                      DataCell(
-                          Text(accreditation['report_barangay'].toString())),
-                      DataCell(
-                          Text(accreditation['report_objective'].toString())),
-                    ],
-                  ),
-                )
-                .toList(),
-          ),
         ),
       ),
       floatingActionButton: Column(

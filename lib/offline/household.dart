@@ -514,7 +514,7 @@ class _houseHoldScreenState extends State<houseHoldScreen> {
         scrollDirection: Axis.vertical,
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
-          child: DataTable(
+          /*   child: DataTable(
             columns: <DataColumn>[
               DataColumn(label: Text('Household LastName')),
               DataColumn(label: Text('Household FirstName')),
@@ -572,7 +572,7 @@ class _houseHoldScreenState extends State<houseHoldScreen> {
                   ),
                 )
                 .toList(),
-          ),
+          ), */
         ),
       ),
       floatingActionButton: Column(

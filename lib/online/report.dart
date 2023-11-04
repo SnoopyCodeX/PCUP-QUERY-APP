@@ -152,7 +152,8 @@ class _ReportScreenState extends State<ReportScreen> {
         Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => FolderSelectionScreen(userData: widget.userData)));
+                builder: (context) =>
+                    FolderSelectionScreen(userData: widget.userData)));
         break;
     }
   }
@@ -516,7 +517,7 @@ class _ReportScreenState extends State<ReportScreen> {
         scrollDirection: Axis.vertical,
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
-          child: DataTable(
+          /*      child: DataTable(
             columns: <DataColumn>[
               DataColumn(label: Text('Program Head')),
               DataColumn(label: Text('Facilitator')),
@@ -540,7 +541,7 @@ class _ReportScreenState extends State<ReportScreen> {
                   ),
                 )
                 .toList(),
-          ),
+          ), */
         ),
       ),
       floatingActionButton: Column(

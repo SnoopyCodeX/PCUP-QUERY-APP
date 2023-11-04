@@ -194,7 +194,8 @@ class _LeadersScreenState extends State<LeadersScreen> {
         Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => FolderSelectionScreen(userData: widget.userData)));
+                builder: (context) =>
+                    FolderSelectionScreen(userData: widget.userData)));
         break;
     }
   }
@@ -297,6 +298,8 @@ class _LeadersScreenState extends State<LeadersScreen> {
 
   String? selectedPosition; // Set the default position
   String? selectedCivilStatus;
+  String? selectedSex;
+
   void _showInsertDataDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -308,7 +311,8 @@ class _LeadersScreenState extends State<LeadersScreen> {
               children: [
                 TextFormField(
                   controller: leaderNameController,
-                  decoration: InputDecoration(labelText: 'Leader Name'),
+                  decoration: InputDecoration(
+                      labelText: 'Leader Fullname (ex. Dela Cruz, Juan)'),
                 ),
 
                 DropdownButtonFormField<String>(
@@ -332,10 +336,26 @@ class _LeadersScreenState extends State<LeadersScreen> {
                     });
                   },
                 ),
-
-                TextFormField(
-                  controller: leaderSexController,
+                DropdownButtonFormField<String>(
                   decoration: InputDecoration(labelText: 'Leader Sex'),
+                  value: selectedSex,
+                  items: [
+                    DropdownMenuItem(
+                      value: 'Male',
+                      child: Text('Male'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'Female',
+                      child: Text('Female'),
+                    ),
+                  ],
+                  onChanged: (selectedItem) {
+                    setState(() {
+                      selectedSex = selectedItem;
+                      leaderSexController.text =
+                          selectedItem!; // Update leaderPositionController
+                    });
+                  },
                 ),
                 TextFormField(
                   controller: leaderAgeController,
@@ -572,7 +592,7 @@ class _LeadersScreenState extends State<LeadersScreen> {
         scrollDirection: Axis.vertical,
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
-          child: DataTable(
+          /*       child: DataTable(
             columns: <DataColumn>[
               DataColumn(label: Text('Leader Name')),
               DataColumn(label: Text('Leader Position')),
@@ -630,7 +650,7 @@ class _LeadersScreenState extends State<LeadersScreen> {
                   ),
                 )
                 .toList(),
-          ),
+          ), */
         ),
       ),
       floatingActionButton: Column(
