@@ -575,11 +575,17 @@ class _houseHoldScreenState extends State<houseHoldScreen> {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          _showInsertDataDialog(context);
-        },
-        child: Icon(Icons.add),
+      floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          FloatingActionButton.extended(
+            onPressed: () {
+              _showInsertDataDialog(context);
+            },
+            label: Text('Add Household'), // Name for the first button
+            icon: Icon(Icons.add),
+          ),
+        ],
       ),
     );
   }

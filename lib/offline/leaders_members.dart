@@ -659,11 +659,17 @@ class _LeadersScreenState extends State<LeadersScreen> {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          _showInsertDataDialog(context);
-        },
-        child: Icon(Icons.add),
+      floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          FloatingActionButton.extended(
+            onPressed: () {
+              _showInsertDataDialog(context);
+            },
+            label: Text('Add Leaders'), // Name for the first button
+            icon: Icon(Icons.add),
+          ),
+        ],
       ),
     );
   }

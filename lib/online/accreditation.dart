@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:query_app/main.dart';
 import 'package:query_app/online/login.dart';
 import 'dart:convert';
 import 'package:query_app/online/settings.dart';
@@ -262,7 +263,7 @@ class _AccreditationScreenState extends State<AccreditationScreen> {
         Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => LoginScreen(userData: widget.userData)));
+                builder: (context) => FolderSelectionScreen(userData: widget.userData)));
         break;
     }
   }
@@ -374,11 +375,17 @@ class _AccreditationScreenState extends State<AccreditationScreen> {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          _openModal(context);
-        },
-        child: Icon(Icons.add),
+      floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          FloatingActionButton.extended(
+            onPressed: () {
+              _openModal(context);
+            },
+            label: Text('Add Accreditation'), // Name for the first button
+            icon: Icon(Icons.add),
+          ),
+        ],
       ),
     );
   }

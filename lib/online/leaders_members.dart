@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:query_app/main.dart';
 import 'package:query_app/online/settings.dart';
 import 'package:query_app/online/report.dart';
 import 'package:query_app/online/accreditation.dart';
@@ -193,7 +194,7 @@ class _LeadersScreenState extends State<LeadersScreen> {
         Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => LoginScreen(userData: widget.userData)));
+                builder: (context) => FolderSelectionScreen(userData: widget.userData)));
         break;
     }
   }
@@ -632,11 +633,17 @@ class _LeadersScreenState extends State<LeadersScreen> {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          _showInsertDataDialog(context);
-        },
-        child: Icon(Icons.add),
+      floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          FloatingActionButton.extended(
+            onPressed: () {
+              _showInsertDataDialog(context);
+            },
+            label: Text('Add Leaders'), // Name for the first button
+            icon: Icon(Icons.add),
+          ),
+        ],
       ),
     );
   }

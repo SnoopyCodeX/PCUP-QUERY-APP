@@ -402,11 +402,17 @@ class _AccreditationScreenState extends State<AccreditationScreen> {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          _openModal(context);
-        },
-        child: Icon(Icons.add),
+      floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          FloatingActionButton.extended(
+            onPressed: () {
+              _openModal(context);
+            },
+            label: Text('Add Accreditation'), // Name for the first button
+            icon: Icon(Icons.add),
+          ),
+        ],
       ),
     );
   }

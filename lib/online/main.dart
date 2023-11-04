@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:query_app/main.dart';
 import 'package:query_app/online/settings.dart';
 import 'package:query_app/online/report.dart';
 import 'package:query_app/online/leaders_members.dart';
@@ -110,7 +111,7 @@ class _MyHomePageState extends State<MyHomePageOnline> {
         Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => LoginScreen(userData: widget.userData)));
+                builder: (context) => FolderSelectionScreen(userData: widget.userData)));
         break;
     }
   }
