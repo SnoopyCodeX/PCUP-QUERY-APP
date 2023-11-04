@@ -68,7 +68,7 @@ class _LeadersScreenState extends State<LeadersScreen> {
 
   Future<void> fetchLeaders() async {
     final Uri apiUrl =
-        Uri.parse('http://192.168.254.159:8080/pcup-api/fetch_leaders.php');
+        Uri.parse('http://linkmopakipastediri/pcup-api/online/fetch_leaders.php');
     try {
       final response = await http.get(apiUrl);
 
@@ -95,7 +95,7 @@ class _LeadersScreenState extends State<LeadersScreen> {
 
   Future<void> fetchBarangayNames() async {
     final Uri apiUrl = Uri.parse(
-        'http://192.168.254.159:8080/pcup-api/fetch_baranggayName.php');
+        'http://linkmopakipastediri/pcup-api/online/fetch_baranggayName.php');
     try {
       final response = await http.get(apiUrl);
 
@@ -241,7 +241,7 @@ class _LeadersScreenState extends State<LeadersScreen> {
 
   void _submitData() async {
     final apiUrl =
-        Uri.parse('http://192.168.254.159:8080/pcup-api/add_leaders.php');
+        Uri.parse('http://linkmopakipastediri/pcup-api/online/add_leaders.php');
     final response = await http.post(
       apiUrl,
       body: {
@@ -299,7 +299,7 @@ class _LeadersScreenState extends State<LeadersScreen> {
   String? selectedPosition; // Set the default position
   String? selectedCivilStatus;
   String? selectedSex;
-
+  String? selectRemarks;
   void _showInsertDataDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -442,9 +442,22 @@ class _LeadersScreenState extends State<LeadersScreen> {
                   decoration:
                       InputDecoration(labelText: 'Leader Below 18 Female'),
                 ),
-                TextFormField(
-                  controller: remarksController,
+                DropdownButtonFormField<String>(
                   decoration: InputDecoration(labelText: 'Leader Remarks'),
+                  value: selectRemarks,
+                  items: [
+                    DropdownMenuItem(
+                      value: 'NEW',
+                      child: Text('NEW'),
+                    ),
+                  ],
+                  onChanged: (selectedItem) {
+                    setState(() {
+                      selectRemarks = selectedItem;
+                      remarksController.text =
+                          selectedItem!; // Update leaderPositionController
+                    });
+                  },
                 ),
                 // Add more TextFormFields with respective controllers for other fields
               ],

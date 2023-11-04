@@ -13,6 +13,8 @@ class ReportScreen extends StatefulWidget {
   final Map<String, dynamic> userData;
 
   ReportScreen({required this.userData});
+  List<String> barangayNames = [];
+  List<String> barangayCrimeNames = [];
 
   @override
   _ReportScreenState createState() => _ReportScreenState();
@@ -50,12 +52,14 @@ class _ReportScreenState extends State<ReportScreen> {
   @override
   void initState() {
     super.initState();
+    fetchBarangayNames();
+    fetchBarangayCrimeNames();
     fetchReports();
   }
 
   Future<void> fetchReports() async {
     final Uri apiUrl =
-        Uri.parse('http://192.168.254.159:8080/pcup-api/fetch_report.php');
+        Uri.parse('http:///pcup-api/fetch_report.php');
     try {
       final response = await http.get(apiUrl);
 
@@ -77,6 +81,64 @@ class _ReportScreenState extends State<ReportScreen> {
     } catch (e) {
       // Handle exceptions, such as network errors or invalid JSON data.
       print('Error fetching data: $e');
+    }
+  }
+
+  Future<void> fetchBarangayNames() async {
+    final Uri apiUrl = Uri.parse(
+        'http://linkmopakipastediri/pcup-api/online/fetch_baranggayName.php');
+    try {
+      final response = await http.get(apiUrl);
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+
+        if (data is List) {
+          final names = data.map((item) {
+            // Extract the "Name" property from each object and convert it to a string
+            return item['Name'].toString();
+          }).toList();
+
+          setState(() {
+            widget.barangayNames = names;
+          });
+        } else {
+          print('API did not return valid JSON data.');
+        }
+      } else {
+        print('API Error: Status Code ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching barangay names: $e');
+    }
+  }
+
+  Future<void> fetchBarangayCrimeNames() async {
+    final Uri apiUrl = Uri.parse(
+        'http://linkmopakipastediri/pcup-api/online/fetch_baranggayName.php');
+    try {
+      final response = await http.get(apiUrl);
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+
+        if (data is List) {
+          final names = data.map((item) {
+            // Extract the "Name" property from each object and convert it to a string
+            return item['Name'].toString();
+          }).toList();
+
+          setState(() {
+            widget.barangayCrimeNames = names;
+          });
+        } else {
+          print('API did not return valid JSON data.');
+        }
+      } else {
+        print('API Error: Status Code ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching barangay names: $e');
     }
   }
 
@@ -216,7 +278,7 @@ class _ReportScreenState extends State<ReportScreen> {
 
   void _submitReport() async {
     final apiUrl =
-        Uri.parse('http://192.168.254.159:8080/pcup-api/add_report.php');
+        Uri.parse('http://linkmopakipastediri/pcup-api/online/add_report.php');
     final response = await http.post(
       apiUrl,
       body: {
@@ -251,7 +313,7 @@ class _ReportScreenState extends State<ReportScreen> {
 
   void _submitCrime() async {
     final apiUrl =
-        Uri.parse('http://192.168.254.159:8080/pcup-api/add_crime.php');
+        Uri.parse('http://linkmopakipastediri/pcup-api/online/add_crime.php');
     final response = await http.post(
       apiUrl,
       body: {
@@ -283,6 +345,40 @@ class _ReportScreenState extends State<ReportScreen> {
     }
   }
 
+  DateTime? selectedsheduleDate;
+  DateTime? selectedcrimeDate;
+  Future<void> _selectscheduleDate(BuildContext context) async {
+    final DateTime picked = (await showDatePicker(
+      context: context,
+      initialDate: selectedsheduleDate ?? DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+    ))!;
+
+    if (picked != null && picked != selectedsheduleDate) {
+      setState(() {
+        selectedsheduleDate = picked;
+        reportDate.text = picked.toLocal().toString().split(' ')[0];
+      });
+    }
+  }
+
+  Future<void> _selectschedulecrimeDate(BuildContext context) async {
+    final DateTime picked = (await showDatePicker(
+      context: context,
+      initialDate: selectedcrimeDate ?? DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+    ))!;
+
+    if (picked != null && picked != selectedcrimeDate) {
+      setState(() {
+        selectedcrimeDate = picked;
+        crimeDate.text = picked.toLocal().toString().split(' ')[0];
+      });
+    }
+  }
+
   void _showInsertReport(BuildContext context) {
     showDialog(
       context: context,
@@ -302,11 +398,35 @@ class _ReportScreenState extends State<ReportScreen> {
                 ),
                 TextFormField(
                   controller: reportDate,
-                  decoration: InputDecoration(labelText: 'Schedule Date'),
+                  decoration: InputDecoration(
+                    labelText: 'Report Birthdate',
+                    hintText: 'Select date',
+                    labelStyle: TextStyle(color: Colors.grey),
+                    hintStyle: TextStyle(color: Colors.black),
+                    prefixIcon: Icon(Icons.calendar_today, color: Colors.blue),
+                    border: InputBorder.none,
+                    focusedBorder: InputBorder.none,
+                  ),
+                  onTap: () {
+                    _selectscheduleDate(context);
+                  },
                 ),
-                TextFormField(
-                  controller: reportBarangay,
-                  decoration: InputDecoration(labelText: 'Barangay'),
+                DropdownButtonFormField<String>(
+                  decoration: InputDecoration(labelText: 'Select Barangay'),
+                  value: widget.barangayNames.isNotEmpty
+                      ? widget.barangayNames[0]
+                      : null,
+                  items: widget.barangayNames.map((String barangayName) {
+                    return DropdownMenuItem<String>(
+                      value: barangayName,
+                      child: Text(barangayName),
+                    );
+                  }).toList(),
+                  onChanged: (selectedBarangay) {
+                    setState(() {
+                      reportBarangay.text = selectedBarangay ?? '';
+                    });
+                  },
                 ),
                 TextFormField(
                   controller: reportObjectives,
@@ -356,7 +476,18 @@ class _ReportScreenState extends State<ReportScreen> {
                 ),
                 TextFormField(
                   controller: crimeDate,
-                  decoration: InputDecoration(labelText: 'Crime Date'),
+                  decoration: InputDecoration(
+                    labelText: 'Crime Date',
+                    hintText: 'Select date',
+                    labelStyle: TextStyle(color: Colors.grey),
+                    hintStyle: TextStyle(color: Colors.black),
+                    prefixIcon: Icon(Icons.calendar_today, color: Colors.blue),
+                    border: InputBorder.none,
+                    focusedBorder: InputBorder.none,
+                  ),
+                  onTap: () {
+                    _selectschedulecrimeDate(context);
+                  },
                 ),
                 TextFormField(
                   controller: crimeVictim,
@@ -366,9 +497,23 @@ class _ReportScreenState extends State<ReportScreen> {
                   controller: crimeViolator,
                   decoration: InputDecoration(labelText: 'Crime Violator'),
                 ),
-                TextFormField(
-                  controller: crimeBarangay,
-                  decoration: InputDecoration(labelText: 'Crime Barangay'),
+                DropdownButtonFormField<String>(
+                  decoration: InputDecoration(labelText: 'Select Barangay'),
+                  value: widget.barangayCrimeNames.isNotEmpty
+                      ? widget.barangayCrimeNames[0]
+                      : null,
+                  items:
+                      widget.barangayCrimeNames.map((String barangaycrimeName) {
+                    return DropdownMenuItem<String>(
+                      value: barangaycrimeName,
+                      child: Text(barangaycrimeName),
+                    );
+                  }).toList(),
+                  onChanged: (selectedBarangay) {
+                    setState(() {
+                      crimeBarangay.text = selectedBarangay ?? '';
+                    });
+                  },
                 ),
 
                 // Add more TextFormFields with respective controllers for other fields
@@ -559,7 +704,7 @@ class _ReportScreenState extends State<ReportScreen> {
             onPressed: () {
               _showInsertCrime(context);
             },
-            label: Text('Another Crime'), // Name for the second button
+            label: Text('Add Crime'), // Name for the second button
             icon: Icon(Icons.add), // Replace with the desired icon
           ),
         ],

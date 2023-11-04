@@ -6,13 +6,15 @@ import 'package:query_app/online/settings.dart';
 import 'package:query_app/online/report.dart';
 import 'package:query_app/online/accreditation.dart';
 import 'package:query_app/online/leaders_members.dart';
-import 'package:query_app/online/login.dart';
+
 import 'package:query_app/online/main.dart';
 
 class houseHoldScreen extends StatefulWidget {
   final Map<String, dynamic> userData;
 
   houseHoldScreen({required this.userData});
+  List<String> barangayNames = [];
+  List<String> accreditationNames = [];
 
   @override
   _houseHoldScreenState createState() => _houseHoldScreenState();
@@ -65,12 +67,14 @@ class _houseHoldScreenState extends State<houseHoldScreen> {
   @override
   void initState() {
     super.initState();
+    fetchBarangayNames();
     fetchHousehold();
+    fetchAccreditationNames();
   }
 
   Future<void> fetchHousehold() async {
     final Uri apiUrl =
-        Uri.parse('http://192.168.254.159:8080/pcup-api/fetch_household.php');
+        Uri.parse('http://linkmopakipastediri/pcup-api/online/fetch_household.php');
     try {
       final response = await http.get(apiUrl);
 
@@ -92,6 +96,64 @@ class _houseHoldScreenState extends State<houseHoldScreen> {
     } catch (e) {
       // Handle exceptions, such as network errors or invalid JSON data.
       print('Error fetching data: $e');
+    }
+  }
+
+  Future<void> fetchBarangayNames() async {
+    final Uri apiUrl = Uri.parse(
+        'http://linkmopakipastediri/pcup-api/online/fetch_baranggayName.php');
+    try {
+      final response = await http.get(apiUrl);
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+
+        if (data is List) {
+          final names = data.map((item) {
+            // Extract the "Name" property from each object and convert it to a string
+            return item['Name'].toString();
+          }).toList();
+
+          setState(() {
+            widget.barangayNames = names;
+          });
+        } else {
+          print('API did not return valid JSON data.');
+        }
+      } else {
+        print('API Error: Status Code ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching barangay names: $e');
+    }
+  }
+
+  Future<void> fetchAccreditationNames() async {
+    final Uri apiUrl = Uri.parse(
+        'http://linkmopakipastediri/pcup-api/online/fetch_householdLeader.php');
+    try {
+      final response = await http.get(apiUrl);
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+
+        if (data is List) {
+          final names = data.map((item) {
+            // Extract the "Name" property from each object and convert it to a string
+            return item['accreditation_name'].toString();
+          }).toList();
+
+          setState(() {
+            widget.accreditationNames = names;
+          });
+        } else {
+          print('API did not return valid JSON data.');
+        }
+      } else {
+        print('API Error: Status Code ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching accreditation names: $e');
     }
   }
 
@@ -216,7 +278,7 @@ class _houseHoldScreenState extends State<houseHoldScreen> {
 
   void _submitData() async {
     final apiUrl =
-        Uri.parse('http://192.168.254.159:8080/pcup-api/add_household.php');
+        Uri.parse('http://linkmopakipastediri/pcup-api/online/add_household.php');
     final response = await http.post(
       apiUrl,
       body: {
@@ -240,7 +302,7 @@ class _houseHoldScreenState extends State<houseHoldScreen> {
         'household_remarks': remarksController.text,
       },
     );
-
+    print(response.body);
     if (response.statusCode == 200) {
       fetchHousehold();
       ScaffoldMessenger.of(context).showSnackBar(
@@ -259,6 +321,48 @@ class _houseHoldScreenState extends State<houseHoldScreen> {
 
   String? selectedSuffix;
   String? selectedSex;
+  DateTime? selectedDateBirthdate;
+  DateTime? selectedDateLastPreg;
+  String? selectPreg;
+  String? selecteducAttainment;
+  String? selectEmployed;
+  String? selectedleaderRelation;
+  String? selectRemarks;
+
+  
+  Future<void> _selectDateBD(BuildContext context) async {
+    final DateTime picked = (await showDatePicker(
+      context: context,
+      initialDate: selectedDateBirthdate ?? DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+    ))!;
+
+    if (picked != null && picked != selectedDateBirthdate) {
+      setState(() {
+        selectedDateBirthdate = picked;
+        householdBirthdateController.text =
+            picked.toLocal().toString().split(' ')[0];
+      });
+    }
+  }
+
+  Future<void> _selectDateLP(BuildContext context) async {
+    final DateTime picked = (await showDatePicker(
+      context: context,
+      initialDate: selectedDateLastPreg ?? DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+    ))!;
+
+    if (picked != null && picked != selectedDateLastPreg) {
+      setState(() {
+        selectedDateLastPreg = picked;
+        lastPregnantController.text = picked.toLocal().toString().split(' ')[0];
+      });
+    }
+  }
+
   void _showInsertDataDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -308,7 +412,18 @@ class _houseHoldScreenState extends State<houseHoldScreen> {
                 ),
                 TextFormField(
                   controller: householdBirthdateController,
-                  decoration: InputDecoration(labelText: 'Household Birthdate'),
+                  decoration: InputDecoration(
+                    labelText: 'Household Birthdate',
+                    hintText: 'Select date',
+                    labelStyle: TextStyle(color: Colors.grey),
+                    hintStyle: TextStyle(color: Colors.black),
+                    prefixIcon: Icon(Icons.calendar_today, color: Colors.blue),
+                    border: InputBorder.none,
+                    focusedBorder: InputBorder.none,
+                  ),
+                  onTap: () {
+                    _selectDateBD(context);
+                  },
                 ),
                 TextFormField(
                   controller: householdAgeController,
@@ -335,27 +450,100 @@ class _houseHoldScreenState extends State<houseHoldScreen> {
                     });
                   },
                 ),
-                TextFormField(
-                  controller: pregnantController,
+                DropdownButtonFormField<String>(
                   decoration: InputDecoration(labelText: 'Household Pregnant'),
+                  value: selectPreg,
+                  items: [
+                    DropdownMenuItem(
+                      value: 'Yes',
+                      child: Text('Yes'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'No',
+                      child: Text('No'),
+                    ),
+                  ],
+                  onChanged: (selectedItem) {
+                    setState(() {
+                      selectPreg = selectedItem;
+                      pregnantController.text =
+                          selectedItem!; // Update leaderPositionController
+                    });
+                  },
                 ),
                 TextFormField(
                   controller: lastPregnantController,
-                  decoration:
-                      InputDecoration(labelText: 'Household Last Pregnant'),
+                  decoration: InputDecoration(
+                    labelText: 'Household Last Pregnant',
+                    hintText: 'Select date',
+                    labelStyle: TextStyle(color: Colors.grey),
+                    hintStyle: TextStyle(color: Colors.black),
+                    prefixIcon: Icon(Icons.calendar_today, color: Colors.blue),
+                    border: InputBorder.none,
+                    focusedBorder: InputBorder.none,
+                  ),
+                  onTap: () {
+                    _selectDateLP(context);
+                  },
                 ),
                 TextFormField(
                   controller: noChildrenController,
                   decoration: InputDecoration(labelText: 'Household No. Child'),
                 ),
-                TextFormField(
-                  controller: baranggayController,
-                  decoration: InputDecoration(labelText: 'Household Baranggay'),
+                DropdownButtonFormField<String>(
+                  decoration: InputDecoration(labelText: 'Household Barangay'),
+                  value: widget.barangayNames.isNotEmpty
+                      ? widget.barangayNames[0]
+                      : null,
+                  items: widget.barangayNames.map((String barangayName) {
+                    return DropdownMenuItem<String>(
+                      value: barangayName,
+                      child: Text(barangayName),
+                    );
+                  }).toList(),
+                  onChanged: (selectedBarangay) {
+                    setState(() {
+                      baranggayController.text = selectedBarangay ?? '';
+                    });
+                  },
                 ),
-                TextFormField(
-                  controller: educAttainmentController,
+                DropdownButtonFormField<String>(
                   decoration: InputDecoration(
                       labelText: 'Household Educational Attainment'),
+                  value: selecteducAttainment,
+                  items: [
+                    DropdownMenuItem(
+                      value: 'ELEMENTARY LEVEL',
+                      child: Text('ELEMENTARY LEVEL'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'ELEMENTARY GRADUATE',
+                      child: Text('ELEMENTARY GRADUATE'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'HIGHSCHOOL LEVEL',
+                      child: Text('HIGHSCHOOL LEVEL'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'HIGHSCHOOL GRADUATE',
+                      child: Text('HIGHSCHOOL GRADUATE'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'COLLEGE LEVEL',
+                      child: Text('COLLEGE LEVEL'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'COLLEGE GRADUATE',
+                      child: Text('COLLEGE GRADUATE'),
+                    ),
+                  ],
+                  onChanged: (selectedItem) {
+                    setState(() {
+                      selecteducAttainment = selectedItem;
+                      educAttainmentController.text =
+                          selectedItem!; // Update leaderPositionController
+                    });
+                  },
                 ),
                 TextFormField(
                   controller: schoolGraudatedController,
@@ -367,21 +555,98 @@ class _houseHoldScreenState extends State<houseHoldScreen> {
                   decoration:
                       InputDecoration(labelText: 'Household Source of Income'),
                 ),
-                TextFormField(
-                  controller: employedController,
+                DropdownButtonFormField<String>(
                   decoration: InputDecoration(labelText: 'Currently Employed'),
+                  value: selectEmployed,
+                  items: [
+                    DropdownMenuItem(
+                      value: 'Yes',
+                      child: Text('Yes'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'No',
+                      child: Text('No'),
+                    ),
+                  ],
+                  onChanged: (selectedItem) {
+                    setState(() {
+                      selectEmployed = selectedItem;
+                      employedController.text =
+                          selectedItem!; // Update leaderPositionController
+                    });
+                  },
                 ),
-                TextFormField(
-                  controller: householdLeaderController,
+                DropdownButtonFormField<String>(
                   decoration: InputDecoration(labelText: 'Household Leader'),
+                  value: widget.accreditationNames.isNotEmpty
+                      ? widget.accreditationNames[0]
+                      : null,
+                  items:
+                      widget.accreditationNames.map((String householdLeader) {
+                    return DropdownMenuItem<String>(
+                      value: householdLeader,
+                      child: Text(householdLeader),
+                    );
+                  }).toList(),
+                  onChanged: (selectedLeader) {
+                    setState(() {
+                      householdLeaderController.text = selectedLeader ?? '';
+                    });
+                  },
                 ),
-                TextFormField(
-                  controller: leaderRelationController,
-                  decoration: InputDecoration(labelText: 'Household Relation'),
+                DropdownButtonFormField<String>(
+                  decoration: InputDecoration(labelText: 'Leader Relation'),
+                  value: selectedleaderRelation,
+                  items: [
+                    DropdownMenuItem(
+                      value: 'FATHER',
+                      child: Text('FATHER'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'MOTHER',
+                      child: Text('MOTHER'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'GRANDMOTHER',
+                      child: Text('GRANDMOTHER'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'GRANDFATHER',
+                      child: Text('GRANDFATHER'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'SIBLING',
+                      child: Text('SIBLING'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'RELATIVE',
+                      child: Text('RELATIVE'),
+                    ),
+                  ],
+                  onChanged: (selectedItem) {
+                    setState(() {
+                      selectedSuffix = selectedItem;
+                      leaderRelationController.text =
+                          selectedItem!; // Update leaderPositionController
+                    });
+                  },
                 ),
-                TextFormField(
-                  controller: remarksController,
-                  decoration: InputDecoration(labelText: 'Household Remarks'),
+                DropdownButtonFormField<String>(
+                  decoration: InputDecoration(labelText: 'Remarks'),
+                  value: selectRemarks,
+                  items: [
+                    DropdownMenuItem(
+                      value: 'NEW',
+                      child: Text('NEW'),
+                    ),
+                  ],
+                  onChanged: (selectedItem) {
+                    setState(() {
+                      selectRemarks = selectedItem;
+                      remarksController.text =
+                          selectedItem!; // Update leaderPositionController
+                    });
+                  },
                 ),
                 // Add more TextFormFields with respective controllers for other fields
               ],
@@ -529,7 +794,7 @@ class _houseHoldScreenState extends State<houseHoldScreen> {
         scrollDirection: Axis.vertical,
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
-          /*       child: DataTable(
+          /*  child: DataTable(
             columns: <DataColumn>[
               DataColumn(label: Text('Household LastName')),
               DataColumn(label: Text('Household FirstName')),

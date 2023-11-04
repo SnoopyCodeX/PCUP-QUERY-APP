@@ -12,6 +12,7 @@ class AccreditationScreen extends StatefulWidget {
   final Map<String, dynamic> userData;
 
   AccreditationScreen({required this.userData});
+  List<String> barangayNames = [];
   @override
   _AccreditationScreenState createState() =>
       _AccreditationScreenState(userData: userData);
@@ -22,21 +23,52 @@ class _AccreditationScreenState extends State<AccreditationScreen> {
   List<Map<String, dynamic>> accreditations = [];
   String message = '';
   TextEditingController nameController = TextEditingController();
+  TextEditingController barangayController = TextEditingController();
   TextEditingController addressController = TextEditingController();
-  TextEditingController presidentController = TextEditingController();
-  TextEditingController contactController = TextEditingController();
-  TextEditingController sexController = TextEditingController();
+  TextEditingController contactPersonController = TextEditingController();
+  TextEditingController dateIsusuedController = TextEditingController();
+  TextEditingController expirationController = TextEditingController();
+  TextEditingController accreditationController = TextEditingController();
+  TextEditingController phoneController = TextEditingController();
+  TextEditingController organizationController = TextEditingController();
+  TextEditingController sizeAreaController = TextEditingController();
+  TextEditingController classificationController = TextEditingController();
+  TextEditingController programsController = TextEditingController();
+  TextEditingController probelmsController = TextEditingController();
+  TextEditingController officerController = TextEditingController();
+  TextEditingController remarksController = TextEditingController();
   _AccreditationScreenState({required this.userData});
+  @override
+  void dispose() {
+    nameController.dispose();
+    barangayController.dispose();
+    addressController.dispose();
+    contactPersonController.dispose();
+    dateIsusuedController.dispose();
+    expirationController.dispose();
+    accreditationController.dispose();
+    phoneController.dispose();
+    organizationController.dispose();
+    sizeAreaController.dispose();
+    classificationController.dispose();
+    programsController.dispose();
+    probelmsController.dispose();
+    officerController.dispose();
+    remarksController.dispose();
+
+    super.dispose();
+  }
 
   @override
   void initState() {
     super.initState();
+    fetchBarangayNames();
     fetchAccreditations();
   }
 
   Future<void> fetchAccreditations() async {
-    final Uri apiUrl = Uri.parse(
-        'http://192.168.254.159:8080/pcup-api/fetch_accreditations.php');
+    final Uri apiUrl =
+        Uri.parse('http://localhost/pcup-api/offline/fetch_accreditations.php');
     try {
       final response = await http.get(apiUrl);
 
@@ -61,20 +93,103 @@ class _AccreditationScreenState extends State<AccreditationScreen> {
     }
   }
 
-  void _openModal(BuildContext context) {
-    // Clear text fields when opening the modal
-    nameController.clear();
-    addressController.clear();
-    presidentController.clear();
-    contactController.clear();
-    sexController.clear();
+  Future<void> fetchBarangayNames() async {
+    final Uri apiUrl = Uri.parse(
+        'http://192.168.254.159:8080/pcup-api/fetch_baranggayName.php');
+    try {
+      final response = await http.get(apiUrl);
 
-    showDialog(
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+
+        if (data is List) {
+          final names = data.map((item) {
+            // Extract the "Name" property from each object and convert it to a string
+            return item['Name'].toString();
+          }).toList();
+
+          setState(() {
+            widget.barangayNames = names;
+          });
+        } else {
+          print('API did not return valid JSON data.');
+        }
+      } else {
+        print('API Error: Status Code ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching barangay names: $e');
+    }
+  }
+
+  bool _validateFields() {
+/*     print("Name: ${nameController.text}");
+    print("Barangay: ${barangayController.text}");
+    print("Name: ${addressController.text}");
+    print("Contact: ${contactPersonController.text}");
+    print("date issued: ${dateIsusuedController.text}");
+    print("expiration: ${expirationController.text}");
+    print("accreditation number number: ${accreditationController.text}");
+    print("phone number: ${phoneController.text}");
+    print("programs: ${programsController.text}");
+    print("classification: ${classificationController.text}");
+    print("size area: ${sizeAreaController.text}");
+    print("problems: ${probelmsController.text}");
+    print("organization: ${organizationController.text}");
+    print("officer: ${officerController.text}");
+    print("remarks: ${remarksController.text}"); */
+
+    return nameController.text.isNotEmpty &&
+        addressController.text.isNotEmpty &&
+        contactPersonController.text.isNotEmpty &&
+        dateIsusuedController.text.isNotEmpty &&
+        expirationController.text.isNotEmpty &&
+        accreditationController.text.isNotEmpty &&
+        phoneController.text.isNotEmpty &&
+        organizationController.text.isNotEmpty &&
+        sizeAreaController.text.isNotEmpty &&
+        classificationController.text.isNotEmpty &&
+        probelmsController.text.isNotEmpty &&
+        programsController.text.isNotEmpty &&
+        officerController.text.isNotEmpty &&
+        remarksController.text.isNotEmpty &&
+        barangayController.text.isNotEmpty;
+  }
+
+  DateTime? selectIssueDate;
+  DateTime? selectExpirationDate;
+  String? selectRemarks;
+
+  Future<void> _selectIssueDate(BuildContext context) async {
+    final DateTime picked = (await showDatePicker(
       context: context,
-      builder: (BuildContext context) {
-        return _buildModalContent(context);
-      },
-    );
+      initialDate: selectIssueDate ?? DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+    ))!;
+
+    if (picked != null && picked != selectIssueDate) {
+      setState(() {
+        selectIssueDate = picked;
+        dateIsusuedController.text = picked.toLocal().toString().split(' ')[0];
+      });
+    }
+  }
+
+  Future<void> _selectExpirationDate(BuildContext context) async {
+    final DateTime picked = (await showDatePicker(
+      context: context,
+      initialDate: selectExpirationDate ?? DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+    ))!;
+
+    if (picked != null && picked != selectExpirationDate) {
+      setState(() {
+        selectExpirationDate = picked;
+        expirationController.text = picked.toLocal().toString().split(' ')[0];
+      });
+    }
   }
 
   Widget _buildModalContent(BuildContext context) {
@@ -88,23 +203,112 @@ class _AccreditationScreenState extends State<AccreditationScreen> {
             // Input fields
             TextField(
               controller: nameController,
-              decoration: InputDecoration(labelText: 'Name'),
+              decoration: InputDecoration(labelText: 'Name of Organization'),
+            ),
+            DropdownButtonFormField<String>(
+              decoration: InputDecoration(labelText: 'Household Barangay'),
+              value: widget.barangayNames.isNotEmpty
+                  ? widget.barangayNames[0]
+                  : null,
+              items: widget.barangayNames.map((String barangayName) {
+                return DropdownMenuItem<String>(
+                  value: barangayName,
+                  child: Text(barangayName),
+                );
+              }).toList(),
+              onChanged: (selectedBarangay) {
+                setState(() {
+                  barangayController.text = selectedBarangay ?? '';
+                });
+              },
             ),
             TextField(
               controller: addressController,
               decoration: InputDecoration(labelText: 'Address'),
             ),
             TextField(
-              controller: presidentController,
-              decoration: InputDecoration(labelText: 'President'),
+              controller: contactPersonController,
+              decoration: InputDecoration(labelText: 'Contact Person'),
+            ),
+            TextFormField(
+              controller: dateIsusuedController,
+              decoration: InputDecoration(
+                labelText: 'Date Issued',
+                hintText: 'Select date',
+                labelStyle: TextStyle(color: Colors.grey),
+                hintStyle: TextStyle(color: Colors.black),
+                prefixIcon: Icon(Icons.calendar_today, color: Colors.blue),
+                border: InputBorder.none,
+                focusedBorder: InputBorder.none,
+              ),
+              onTap: () {
+                _selectIssueDate(context);
+              },
+            ),
+            TextFormField(
+              controller: expirationController,
+              decoration: InputDecoration(
+                labelText: 'Expiration',
+                hintText: 'Select date',
+                labelStyle: TextStyle(color: Colors.grey),
+                hintStyle: TextStyle(color: Colors.black),
+                prefixIcon: Icon(Icons.calendar_today, color: Colors.blue),
+                border: InputBorder.none,
+                focusedBorder: InputBorder.none,
+              ),
+              onTap: () {
+                _selectExpirationDate(context);
+              },
             ),
             TextField(
-              controller: contactController,
-              decoration: InputDecoration(labelText: 'Contact'),
+              controller: accreditationController,
+              decoration: InputDecoration(labelText: 'Accreditation Number'),
             ),
             TextField(
-              controller: sexController,
-              decoration: InputDecoration(labelText: 'Sex'),
+              controller: phoneController,
+              decoration: InputDecoration(labelText: 'Phone Number'),
+            ),
+            TextField(
+              controller: organizationController,
+              decoration: InputDecoration(labelText: 'Organization President'),
+            ),
+            TextField(
+              controller: sizeAreaController,
+              decoration:
+                  InputDecoration(labelText: 'Size Area Of Organization'),
+            ),
+            TextField(
+              controller: classificationController,
+              decoration: InputDecoration(labelText: 'Classification'),
+            ),
+            TextField(
+              controller: programsController,
+              decoration: InputDecoration(labelText: 'Programs Availed'),
+            ),
+            TextField(
+              controller: probelmsController,
+              decoration: InputDecoration(labelText: 'Common Problems'),
+            ),
+            TextField(
+              controller: officerController,
+              decoration: InputDecoration(labelText: 'Accreditation Officer'),
+            ),
+            DropdownButtonFormField<String>(
+              decoration: InputDecoration(labelText: 'Remarks'),
+              value: selectRemarks,
+              items: [
+                DropdownMenuItem(
+                  value: 'NEW',
+                  child: Text('NEW'),
+                ),
+              ],
+              onChanged: (selectedItem) {
+                setState(() {
+                  selectRemarks = selectedItem;
+                  remarksController.text =
+                      selectedItem!; // Update leaderPositionController
+                });
+              },
             ),
           ],
         ),
@@ -129,14 +333,6 @@ class _AccreditationScreenState extends State<AccreditationScreen> {
         ),
       ],
     );
-  }
-
-  bool _validateFields() {
-    return nameController.text.isNotEmpty &&
-        addressController.text.isNotEmpty &&
-        presidentController.text.isNotEmpty &&
-        contactController.text.isNotEmpty &&
-        sexController.text.isNotEmpty;
   }
 
   Widget _buildListTile(
@@ -183,20 +379,31 @@ class _AccreditationScreenState extends State<AccreditationScreen> {
     );
   }
 
+// ...
   void _submitData() async {
-    final apiUrl =
-        Uri.parse('http://192.168.254.159:8080/pcup-api/add_accreditation.php');
+    final apiUrl = Uri.parse(
+        'http://localhost/pcup-api/offline/offline/add_accreditation.php');
     final response = await http.post(
       apiUrl,
       body: {
-        'Name': nameController.text,
-        'Address': addressController.text,
-        'President': presidentController.text,
-        'Contact': contactController.text,
-        'Sex': sexController.text,
+        'accreditation_name': nameController.text,
+        'accreditation_barangay': barangayController.text,
+        'accreditation_address': addressController.text,
+        'accreditation_contactperson': contactPersonController.text,
+        'accreditation_issued': dateIsusuedController.text,
+        'accreditation_expired': expirationController.text,
+        'accreditation_number': accreditationController.text,
+        'accreditation_phone': phoneController.text,
+        'accreditation_president': organizationController.text,
+        'accreditation_area': sizeAreaController.text,
+        'accreditation_class': classificationController.text,
+        'accreditation_programs': programsController.text,
+        'accreditation_problems': probelmsController.text,
+        'accreditation_coordinator': officerController.text,
+        'accreditation_remarks': remarksController.text,
       },
     );
-
+    print(response.body);
     if (response.statusCode == 200) {
       fetchAccreditations();
       ScaffoldMessenger.of(context).showSnackBar(
@@ -204,6 +411,21 @@ class _AccreditationScreenState extends State<AccreditationScreen> {
           content: Text('Successfully Added'),
         ),
       );
+      nameController.clear();
+      addressController.clear();
+      barangayController.clear();
+      contactPersonController.clear();
+      dateIsusuedController.clear();
+      expirationController.clear();
+      accreditationController.clear();
+      phoneController.clear();
+      organizationController.clear();
+      sizeAreaController.clear();
+      classificationController.clear();
+      probelmsController.clear();
+      programsController.clear();
+      officerController.clear();
+      remarksController.clear();
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -212,6 +434,7 @@ class _AccreditationScreenState extends State<AccreditationScreen> {
       );
     }
   }
+// ...
 
   void _navigateToScreen(String routeName) {
     Navigator.of(context).pop(); // Close the sidebar
@@ -258,7 +481,7 @@ class _AccreditationScreenState extends State<AccreditationScreen> {
                 builder: (context) =>
                     SettingsScreen(userData: widget.userData)));
         break;
-      case 'Back':
+      case 'Logout':
         Navigator.push(
             context,
             MaterialPageRoute(
@@ -271,7 +494,7 @@ class _AccreditationScreenState extends State<AccreditationScreen> {
   @override
   Widget build(BuildContext context) {
     final userData = widget.userData;
-
+    final userImage = AssetImage('assets/images/avatar.png');
     return Scaffold(
       appBar: AppBar(
         title: Text('Accreditation'),
@@ -287,64 +510,37 @@ class _AccreditationScreenState extends State<AccreditationScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     SizedBox(height: 10),
-                    FutureBuilder<Map<String, dynamic>>(
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return CircularProgressIndicator();
-                        } else if (snapshot.hasError) {
-                          return Text(
-                            'Error loading user data',
-                            style: TextStyle(color: Colors.white, fontSize: 18),
-                          );
-                        } else {
-                          // Static text
-                          final firstname = 'John';
-                          final lastname = 'Doe';
-                          final userEmail = 'john.doe@example.com';
-
-                          return Column(
-                            children: [
-                              Container(
-                                width: double.infinity,
-                                padding: EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  color: Colors.blueAccent,
-                                  borderRadius: BorderRadius.circular(8),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.3),
-                                      blurRadius: 3,
-                                      offset: Offset(0, 2),
-                                    ),
-                                  ],
-                                ),
-                                child: Column(
-                                  children: [
-                                    CircleAvatar(
-                                      backgroundColor: Colors.blueAccent[100],
-                                      radius: 30,
-                                      backgroundImage: AssetImage(
-                                          'assets/images/avatar.png'), // Replace with actual user image
-                                    ),
-                                    Text(
-                                      '$firstname $lastname',
-                                      style: TextStyle(
-                                          color: Colors.white, fontSize: 20),
-                                    ),
-                                    SizedBox(height: 5),
-                                    Text(
-                                      '$userEmail',
-                                      style: TextStyle(
-                                          color: Colors.white, fontSize: 16),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          );
-                        }
-                      },
+                    Container(
+                      width: double.infinity,
+                      padding: EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Colors.blueAccent,
+                        borderRadius: BorderRadius.circular(8),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.3),
+                            blurRadius: 3,
+                            offset: Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        children: [
+                          CircleAvatar(
+                            radius: 30,
+                            backgroundImage: userImage,
+                          ),
+                          Text(
+                            '${userData['user_name']}',
+                            style: TextStyle(color: Colors.white, fontSize: 20),
+                          ),
+                          SizedBox(height: 5),
+                          Text(
+                            '${userData['user_email']}',
+                            style: TextStyle(color: Colors.white, fontSize: 16),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
@@ -368,8 +564,8 @@ class _AccreditationScreenState extends State<AccreditationScreen> {
             _buildListTile('Settings', Icons.settings, 16, () {
               _navigateToScreen('Settings');
             }),
-            _buildListTile('Back', Icons.logout_rounded, 16, () {
-              _navigateToScreen('Back');
+            _buildListTile('Logout', Icons.logout, 16, () {
+              _navigateToScreen('Logout');
             }),
           ],
         ),
@@ -378,41 +574,19 @@ class _AccreditationScreenState extends State<AccreditationScreen> {
         scrollDirection: Axis.vertical,
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
-          /*   child: DataTable(
-            columns: <DataColumn>[
-              DataColumn(label: Text('Name')),
-              DataColumn(label: Text('Address')),
-              DataColumn(label: Text('President')),
-              DataColumn(label: Text('Contact')),
-              DataColumn(label: Text('Sex')),
-            ],
-            rows: accreditations
-                .map(
-                  (accreditation) => DataRow(
-                    cells: <DataCell>[
-                      DataCell(Text(accreditation['Name'].toString())),
-                      DataCell(Text(accreditation['address'].toString())),
-                      DataCell(Text(accreditation['president'].toString())),
-                      DataCell(Text(accreditation['contact'].toString())),
-                      DataCell(Text(accreditation['sex'].toString())),
-                    ],
-                  ),
-                )
-                .toList(),
-          ), */
         ),
       ),
-      floatingActionButton: Column(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          FloatingActionButton.extended(
-            onPressed: () {
-              _openModal(context);
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          showDialog(
+            context: context,
+            builder: (context) {
+              return _buildModalContent(context); // Call the method here
             },
-            label: Text('Add Accreditation'), // Name for the first button
-            icon: Icon(Icons.add),
-          ),
-        ],
+          );
+        },
+        label: Text('Add Accreditation'),
+        icon: Icon(Icons.add),
       ),
     );
   }

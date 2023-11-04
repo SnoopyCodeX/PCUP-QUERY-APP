@@ -12,6 +12,8 @@ class ReportScreen extends StatefulWidget {
   final Map<String, dynamic> userData;
 
   ReportScreen({required this.userData});
+  List<String> barangayNames = [];
+  List<String> barangayCrimeNames = [];
 
   @override
   _ReportScreenState createState() => _ReportScreenState();
@@ -49,12 +51,13 @@ class _ReportScreenState extends State<ReportScreen> {
   @override
   void initState() {
     super.initState();
+    fetchBarangayNames();
+    fetchBarangayCrimeNames();
     fetchReports();
   }
 
   Future<void> fetchReports() async {
-    final Uri apiUrl =
-        Uri.parse('http://192.168.254.159:8080/pcup-api/fetch_report.php');
+    final Uri apiUrl = Uri.parse('http://localhost/pcup-api/offline/fetch_report.php');
     try {
       final response = await http.get(apiUrl);
 
@@ -76,6 +79,64 @@ class _ReportScreenState extends State<ReportScreen> {
     } catch (e) {
       // Handle exceptions, such as network errors or invalid JSON data.
       print('Error fetching data: $e');
+    }
+  }
+
+  Future<void> fetchBarangayNames() async {
+    final Uri apiUrl =
+        Uri.parse('http://localhost/pcup-api/offline/fetch_baranggayName.php');
+    try {
+      final response = await http.get(apiUrl);
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+
+        if (data is List) {
+          final names = data.map((item) {
+            // Extract the "Name" property from each object and convert it to a string
+            return item['Name'].toString();
+          }).toList();
+
+          setState(() {
+            widget.barangayNames = names;
+          });
+        } else {
+          print('API did not return valid JSON data.');
+        }
+      } else {
+        print('API Error: Status Code ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching barangay names: $e');
+    }
+  }
+
+  Future<void> fetchBarangayCrimeNames() async {
+    final Uri apiUrl =
+        Uri.parse('http://localhost/pcup-api/offline/fetch_baranggayName.php');
+    try {
+      final response = await http.get(apiUrl);
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+
+        if (data is List) {
+          final names = data.map((item) {
+            // Extract the "Name" property from each object and convert it to a string
+            return item['Name'].toString();
+          }).toList();
+
+          setState(() {
+            widget.barangayCrimeNames = names;
+          });
+        } else {
+          print('API did not return valid JSON data.');
+        }
+      } else {
+        print('API Error: Status Code ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching barangay names: $e');
     }
   }
 
@@ -147,7 +208,7 @@ class _ReportScreenState extends State<ReportScreen> {
                 builder: (context) =>
                     SettingsScreen(userData: widget.userData)));
         break;
-      case 'Back':
+      case 'Logout':
         Navigator.push(
             context,
             MaterialPageRoute(
@@ -214,8 +275,7 @@ class _ReportScreenState extends State<ReportScreen> {
   }
 
   void _submitReport() async {
-    final apiUrl =
-        Uri.parse('http://192.168.254.159:8080/pcup-api/add_report.php');
+    final apiUrl = Uri.parse('http://localhost/pcup-api/offline/add_report.php');
     final response = await http.post(
       apiUrl,
       body: {
@@ -249,8 +309,7 @@ class _ReportScreenState extends State<ReportScreen> {
   }
 
   void _submitCrime() async {
-    final apiUrl =
-        Uri.parse('http://192.168.254.159:8080/pcup-api/add_crime.php');
+    final apiUrl = Uri.parse('http://localhost/pcup-api/offline/add_crime.php');
     final response = await http.post(
       apiUrl,
       body: {
@@ -282,6 +341,40 @@ class _ReportScreenState extends State<ReportScreen> {
     }
   }
 
+  DateTime? selectedsheduleDate;
+  DateTime? selectedcrimeDate;
+  Future<void> _selectscheduleDate(BuildContext context) async {
+    final DateTime picked = (await showDatePicker(
+      context: context,
+      initialDate: selectedsheduleDate ?? DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+    ))!;
+
+    if (picked != null && picked != selectedsheduleDate) {
+      setState(() {
+        selectedsheduleDate = picked;
+        reportDate.text = picked.toLocal().toString().split(' ')[0];
+      });
+    }
+  }
+
+  Future<void> _selectschedulecrimeDate(BuildContext context) async {
+    final DateTime picked = (await showDatePicker(
+      context: context,
+      initialDate: selectedcrimeDate ?? DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+    ))!;
+
+    if (picked != null && picked != selectedcrimeDate) {
+      setState(() {
+        selectedcrimeDate = picked;
+        crimeDate.text = picked.toLocal().toString().split(' ')[0];
+      });
+    }
+  }
+
   void _showInsertReport(BuildContext context) {
     showDialog(
       context: context,
@@ -301,11 +394,35 @@ class _ReportScreenState extends State<ReportScreen> {
                 ),
                 TextFormField(
                   controller: reportDate,
-                  decoration: InputDecoration(labelText: 'Schedule Date'),
+                  decoration: InputDecoration(
+                    labelText: 'Report Birthdate',
+                    hintText: 'Select date',
+                    labelStyle: TextStyle(color: Colors.grey),
+                    hintStyle: TextStyle(color: Colors.black),
+                    prefixIcon: Icon(Icons.calendar_today, color: Colors.blue),
+                    border: InputBorder.none,
+                    focusedBorder: InputBorder.none,
+                  ),
+                  onTap: () {
+                    _selectscheduleDate(context);
+                  },
                 ),
-                TextFormField(
-                  controller: reportBarangay,
-                  decoration: InputDecoration(labelText: 'Barangay'),
+                DropdownButtonFormField<String>(
+                  decoration: InputDecoration(labelText: 'Select Barangay'),
+                  value: widget.barangayNames.isNotEmpty
+                      ? widget.barangayNames[0]
+                      : null,
+                  items: widget.barangayNames.map((String barangayName) {
+                    return DropdownMenuItem<String>(
+                      value: barangayName,
+                      child: Text(barangayName),
+                    );
+                  }).toList(),
+                  onChanged: (selectedBarangay) {
+                    setState(() {
+                      reportBarangay.text = selectedBarangay ?? '';
+                    });
+                  },
                 ),
                 TextFormField(
                   controller: reportObjectives,
@@ -355,7 +472,18 @@ class _ReportScreenState extends State<ReportScreen> {
                 ),
                 TextFormField(
                   controller: crimeDate,
-                  decoration: InputDecoration(labelText: 'Crime Date'),
+                  decoration: InputDecoration(
+                    labelText: 'Crime Date',
+                    hintText: 'Select date',
+                    labelStyle: TextStyle(color: Colors.grey),
+                    hintStyle: TextStyle(color: Colors.black),
+                    prefixIcon: Icon(Icons.calendar_today, color: Colors.blue),
+                    border: InputBorder.none,
+                    focusedBorder: InputBorder.none,
+                  ),
+                  onTap: () {
+                    _selectschedulecrimeDate(context);
+                  },
                 ),
                 TextFormField(
                   controller: crimeVictim,
@@ -365,9 +493,23 @@ class _ReportScreenState extends State<ReportScreen> {
                   controller: crimeViolator,
                   decoration: InputDecoration(labelText: 'Crime Violator'),
                 ),
-                TextFormField(
-                  controller: crimeBarangay,
-                  decoration: InputDecoration(labelText: 'Crime Barangay'),
+                DropdownButtonFormField<String>(
+                  decoration: InputDecoration(labelText: 'Select Barangay'),
+                  value: widget.barangayCrimeNames.isNotEmpty
+                      ? widget.barangayCrimeNames[0]
+                      : null,
+                  items:
+                      widget.barangayCrimeNames.map((String barangaycrimeName) {
+                    return DropdownMenuItem<String>(
+                      value: barangaycrimeName,
+                      child: Text(barangaycrimeName),
+                    );
+                  }).toList(),
+                  onChanged: (selectedBarangay) {
+                    setState(() {
+                      crimeBarangay.text = selectedBarangay ?? '';
+                    });
+                  },
                 ),
 
                 // Add more TextFormFields with respective controllers for other fields
@@ -401,6 +543,7 @@ class _ReportScreenState extends State<ReportScreen> {
   @override
   Widget build(BuildContext context) {
     final userData = widget.userData;
+    final userImage = AssetImage('assets/images/avatar.png');
     return Scaffold(
       appBar: AppBar(
         title: Text('Reports'),
@@ -416,64 +559,37 @@ class _ReportScreenState extends State<ReportScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     SizedBox(height: 10),
-                    FutureBuilder<Map<String, dynamic>>(
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return CircularProgressIndicator();
-                        } else if (snapshot.hasError) {
-                          return Text(
-                            'Error loading user data',
-                            style: TextStyle(color: Colors.white, fontSize: 18),
-                          );
-                        } else {
-                          // Static text
-                          final firstname = 'John';
-                          final lastname = 'Doe';
-                          final userEmail = 'john.doe@example.com';
-
-                          return Column(
-                            children: [
-                              Container(
-                                width: double.infinity,
-                                padding: EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  color: Colors.blueAccent,
-                                  borderRadius: BorderRadius.circular(8),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.3),
-                                      blurRadius: 3,
-                                      offset: Offset(0, 2),
-                                    ),
-                                  ],
-                                ),
-                                child: Column(
-                                  children: [
-                                    CircleAvatar(
-                                      backgroundColor: Colors.blueAccent[100],
-                                      radius: 30,
-                                      backgroundImage: AssetImage(
-                                          'assets/images/avatar.png'), // Replace with actual user image
-                                    ),
-                                    Text(
-                                      '$firstname $lastname',
-                                      style: TextStyle(
-                                          color: Colors.white, fontSize: 20),
-                                    ),
-                                    SizedBox(height: 5),
-                                    Text(
-                                      '$userEmail',
-                                      style: TextStyle(
-                                          color: Colors.white, fontSize: 16),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          );
-                        }
-                      },
+                    Container(
+                      width: double.infinity,
+                      padding: EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Colors.blueAccent,
+                        borderRadius: BorderRadius.circular(8),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.3),
+                            blurRadius: 3,
+                            offset: Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        children: [
+                          CircleAvatar(
+                            radius: 30,
+                            backgroundImage: userImage,
+                          ),
+                          Text(
+                            '${userData['user_name']}',
+                            style: TextStyle(color: Colors.white, fontSize: 20),
+                          ),
+                          SizedBox(height: 5),
+                          Text(
+                            '${userData['user_email']}',
+                            style: TextStyle(color: Colors.white, fontSize: 16),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
@@ -529,11 +645,11 @@ class _ReportScreenState extends State<ReportScreen> {
             }),
             _buildListTile(
                 context, // Pass the context
-                'Back',
-                Icons.logout_rounded,
+                'Logout',
+                Icons.logout,
                 16, () {
               _navigateToScreen(
-                  context, 'Back'); // Pass context to _navigateToScreen
+                  context, 'Logout'); // Pass context to _navigateToScreen
             }),
           ],
         ),
@@ -542,6 +658,31 @@ class _ReportScreenState extends State<ReportScreen> {
         scrollDirection: Axis.vertical,
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
+          /*      child: DataTable(
+            columns: <DataColumn>[
+              DataColumn(label: Text('Program Head')),
+              DataColumn(label: Text('Facilitator')),
+              DataColumn(label: Text('Schedule Date')),
+              DataColumn(label: Text('Barangay')),
+              DataColumn(label: Text('Description')),
+            ],
+            rows: reports
+                .map(
+                  (accreditation) => DataRow(
+                    cells: <DataCell>[
+                      DataCell(Text(accreditation['report_name'].toString())),
+                      DataCell(
+                          Text(accreditation['report_facilitator'].toString())),
+                      DataCell(Text(accreditation['report_date'].toString())),
+                      DataCell(
+                          Text(accreditation['report_barangay'].toString())),
+                      DataCell(
+                          Text(accreditation['report_objective'].toString())),
+                    ],
+                  ),
+                )
+                .toList(),
+          ), */
         ),
       ),
       floatingActionButton: Column(
@@ -559,7 +700,7 @@ class _ReportScreenState extends State<ReportScreen> {
             onPressed: () {
               _showInsertCrime(context);
             },
-            label: Text('Another Crime'), // Name for the second button
+            label: Text('Add Crime'), // Name for the second button
             icon: Icon(Icons.add), // Replace with the desired icon
           ),
         ],

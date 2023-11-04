@@ -66,8 +66,7 @@ class _LeadersScreenState extends State<LeadersScreen> {
   }
 
   Future<void> fetchLeaders() async {
-    final Uri apiUrl =
-        Uri.parse('http://192.168.254.159:8080/pcup-api/fetch_leaders.php');
+    final Uri apiUrl = Uri.parse('http://localhost/pcup-api/offline/fetch_leaders.php');
     try {
       final response = await http.get(apiUrl);
 
@@ -93,8 +92,8 @@ class _LeadersScreenState extends State<LeadersScreen> {
   }
 
   Future<void> fetchBarangayNames() async {
-    final Uri apiUrl = Uri.parse(
-        'http://192.168.254.159:8080/pcup-api/fetch_baranggayName.php');
+    final Uri apiUrl =
+        Uri.parse('http://localhost/pcup-api/offline/fetch_baranggayName.php');
     try {
       final response = await http.get(apiUrl);
 
@@ -189,7 +188,7 @@ class _LeadersScreenState extends State<LeadersScreen> {
                 builder: (context) =>
                     SettingsScreen(userData: widget.userData)));
         break;
-      case 'Back':
+      case 'Logout':
         Navigator.push(
             context,
             MaterialPageRoute(
@@ -239,8 +238,7 @@ class _LeadersScreenState extends State<LeadersScreen> {
   }
 
   void _submitData() async {
-    final apiUrl =
-        Uri.parse('http://192.168.254.159:8080/pcup-api/add_leaders.php');
+    final apiUrl = Uri.parse('http://localhost/pcup-api/offline/add_leaders.php');
     final response = await http.post(
       apiUrl,
       body: {
@@ -297,6 +295,8 @@ class _LeadersScreenState extends State<LeadersScreen> {
 
   String? selectedPosition; // Set the default position
   String? selectedCivilStatus;
+  String? selectedSex;
+  String? selectRemarks;
   void _showInsertDataDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -308,7 +308,8 @@ class _LeadersScreenState extends State<LeadersScreen> {
               children: [
                 TextFormField(
                   controller: leaderNameController,
-                  decoration: InputDecoration(labelText: 'Leader Name'),
+                  decoration: InputDecoration(
+                      labelText: 'Leader Fullname (ex. Dela Cruz, Juan)'),
                 ),
 
                 DropdownButtonFormField<String>(
@@ -332,10 +333,26 @@ class _LeadersScreenState extends State<LeadersScreen> {
                     });
                   },
                 ),
-
-                TextFormField(
-                  controller: leaderSexController,
+                DropdownButtonFormField<String>(
                   decoration: InputDecoration(labelText: 'Leader Sex'),
+                  value: selectedSex,
+                  items: [
+                    DropdownMenuItem(
+                      value: 'Male',
+                      child: Text('Male'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'Female',
+                      child: Text('Female'),
+                    ),
+                  ],
+                  onChanged: (selectedItem) {
+                    setState(() {
+                      selectedSex = selectedItem;
+                      leaderSexController.text =
+                          selectedItem!; // Update leaderPositionController
+                    });
+                  },
                 ),
                 TextFormField(
                   controller: leaderAgeController,
@@ -422,9 +439,22 @@ class _LeadersScreenState extends State<LeadersScreen> {
                   decoration:
                       InputDecoration(labelText: 'Leader Below 18 Female'),
                 ),
-                TextFormField(
-                  controller: remarksController,
+                DropdownButtonFormField<String>(
                   decoration: InputDecoration(labelText: 'Leader Remarks'),
+                  value: selectRemarks,
+                  items: [
+                    DropdownMenuItem(
+                      value: 'NEW',
+                      child: Text('NEW'),
+                    ),
+                  ],
+                  onChanged: (selectedItem) {
+                    setState(() {
+                      selectRemarks = selectedItem;
+                      remarksController.text =
+                          selectedItem!; // Update leaderPositionController
+                    });
+                  },
                 ),
                 // Add more TextFormFields with respective controllers for other fields
               ],
@@ -457,6 +487,7 @@ class _LeadersScreenState extends State<LeadersScreen> {
   @override
   Widget build(BuildContext context) {
     final userData = widget.userData;
+    final userImage = AssetImage('assets/images/avatar.png');
     return Scaffold(
       appBar: AppBar(
         title: Text('Leaders and Members'),
@@ -472,64 +503,37 @@ class _LeadersScreenState extends State<LeadersScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
                     SizedBox(height: 10),
-                    FutureBuilder<Map<String, dynamic>>(
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return CircularProgressIndicator();
-                        } else if (snapshot.hasError) {
-                          return Text(
-                            'Error loading user data',
-                            style: TextStyle(color: Colors.white, fontSize: 18),
-                          );
-                        } else {
-                          // Static text
-                          final firstname = 'John';
-                          final lastname = 'Doe';
-                          final userEmail = 'john.doe@example.com';
-
-                          return Column(
-                            children: [
-                              Container(
-                                width: double.infinity,
-                                padding: EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                  color: Colors.blueAccent,
-                                  borderRadius: BorderRadius.circular(8),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.3),
-                                      blurRadius: 3,
-                                      offset: Offset(0, 2),
-                                    ),
-                                  ],
-                                ),
-                                child: Column(
-                                  children: [
-                                    CircleAvatar(
-                                      backgroundColor: Colors.blueAccent[100],
-                                      radius: 30,
-                                      backgroundImage: AssetImage(
-                                          'assets/images/avatar.png'), // Replace with actual user image
-                                    ),
-                                    Text(
-                                      '$firstname $lastname',
-                                      style: TextStyle(
-                                          color: Colors.white, fontSize: 20),
-                                    ),
-                                    SizedBox(height: 5),
-                                    Text(
-                                      '$userEmail',
-                                      style: TextStyle(
-                                          color: Colors.white, fontSize: 16),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          );
-                        }
-                      },
+                    Container(
+                      width: double.infinity,
+                      padding: EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Colors.blueAccent,
+                        borderRadius: BorderRadius.circular(8),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.3),
+                            blurRadius: 3,
+                            offset: Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        children: [
+                          CircleAvatar(
+                            radius: 30,
+                            backgroundImage: userImage,
+                          ),
+                          Text(
+                            '${userData['user_name']}',
+                            style: TextStyle(color: Colors.white, fontSize: 20),
+                          ),
+                          SizedBox(height: 5),
+                          Text(
+                            '${userData['user_email']}',
+                            style: TextStyle(color: Colors.white, fontSize: 16),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
@@ -585,11 +589,11 @@ class _LeadersScreenState extends State<LeadersScreen> {
             }),
             _buildListTile(
                 context, // Pass the context
-                'Back',
-                Icons.logout_rounded,
+                'Logout',
+                Icons.logout,
                 16, () {
               _navigateToScreen(
-                  context, 'Back'); // Pass context to _navigateToScreen
+                  context, 'Logout'); // Pass context to _navigateToScreen
             }),
           ],
         ),
@@ -598,7 +602,7 @@ class _LeadersScreenState extends State<LeadersScreen> {
         scrollDirection: Axis.vertical,
         child: SingleChildScrollView(
           scrollDirection: Axis.horizontal,
-          /*        child: DataTable(
+          /*       child: DataTable(
             columns: <DataColumn>[
               DataColumn(label: Text('Leader Name')),
               DataColumn(label: Text('Leader Position')),

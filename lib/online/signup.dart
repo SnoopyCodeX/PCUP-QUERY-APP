@@ -95,7 +95,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
                         final response = await http.post(
                           Uri.parse(
-                              'http://192.168.254.159:8080/pcup-api/signup.php'),
+                              'http://sweet-salvador.kenkarlo.com/lib/signup.php'),
                           body: {
                             'user_name': username,
                             'user_password': password,
