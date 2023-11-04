@@ -12,6 +12,7 @@ class LeadersScreen extends StatefulWidget {
   final Map<String, dynamic> userData;
 
   LeadersScreen({required this.userData});
+  List<String> barangayNames = [];
 
   @override
   _LeadersScreenState createState() => _LeadersScreenState();
@@ -60,6 +61,7 @@ class _LeadersScreenState extends State<LeadersScreen> {
   @override
   void initState() {
     super.initState();
+    fetchBarangayNames();
     fetchLeaders();
   }
 
@@ -87,6 +89,35 @@ class _LeadersScreenState extends State<LeadersScreen> {
     } catch (e) {
       // Handle exceptions, such as network errors or invalid JSON data.
       print('Error fetching data: $e');
+    }
+  }
+
+  Future<void> fetchBarangayNames() async {
+    final Uri apiUrl = Uri.parse(
+        'http://192.168.254.159:8080/pcup-api/fetch_baranggayName.php');
+    try {
+      final response = await http.get(apiUrl);
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+
+        if (data is List) {
+          final names = data.map((item) {
+            // Extract the "Name" property from each object and convert it to a string
+            return item['Name'].toString();
+          }).toList();
+
+          setState(() {
+            widget.barangayNames = names;
+          });
+        } else {
+          print('API did not return valid JSON data.');
+        }
+      } else {
+        print('API Error: Status Code ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error fetching barangay names: $e');
     }
   }
 
@@ -223,7 +254,7 @@ class _LeadersScreenState extends State<LeadersScreen> {
         'leader_total_female': totalFemaleController.text.toString(),
         'leader_totalpwd_physical_male': pwdMaleController.text.toString(),
         'leader_totalpwd_physical_female': pwdFemaleController.text.toString(),
-        'leader_senior_male': srMaleController..toString(),
+        'leader_senior_male': srMaleController.toString(),
         'leader_senior_female': srFemaleController.text.toString(),
         'leader_below_18_male': minorMaleController.text.toString(),
         'leader_below_18_female': minorFemaleController.text.toString(),
@@ -238,6 +269,22 @@ class _LeadersScreenState extends State<LeadersScreen> {
           content: Text('Successfully Added'),
         ),
       );
+      leaderNameController.text = '';
+      leaderPositionController.text = '';
+      leaderSexController.text = '';
+      leaderAgeController.text = '';
+      barangayController.text = '';
+      civilStatusController.text = '';
+      famMembersController.text = '';
+      totalFemaleController.text = '';
+      totalMaleController.text = '';
+      pwdFemaleController.text = '';
+      pwdMaleController.text = '';
+      srFemaleController.text = '';
+      srMaleController.text = '';
+      minorFemaleController.text = '';
+      srMaleController.text = '';
+      remarksController.text = '';
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -247,6 +294,8 @@ class _LeadersScreenState extends State<LeadersScreen> {
     }
   }
 
+  String? selectedPosition; // Set the default position
+  String? selectedCivilStatus;
   void _showInsertDataDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -260,10 +309,29 @@ class _LeadersScreenState extends State<LeadersScreen> {
                   controller: leaderNameController,
                   decoration: InputDecoration(labelText: 'Leader Name'),
                 ),
-                TextFormField(
-                  controller: leaderPositionController,
+
+                DropdownButtonFormField<String>(
                   decoration: InputDecoration(labelText: 'Leader Position'),
+                  value: selectedPosition,
+                  items: [
+                    DropdownMenuItem(
+                      value: 'PRESIDENT',
+                      child: Text('PRESIDENT'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'MEMBER',
+                      child: Text('MEMBER'),
+                    ),
+                  ],
+                  onChanged: (selectedItem) {
+                    setState(() {
+                      selectedPosition = selectedItem;
+                      leaderPositionController.text =
+                          selectedItem!; // Update leaderPositionController
+                    });
+                  },
                 ),
+
                 TextFormField(
                   controller: leaderSexController,
                   decoration: InputDecoration(labelText: 'Leader Sex'),
@@ -272,14 +340,45 @@ class _LeadersScreenState extends State<LeadersScreen> {
                   controller: leaderAgeController,
                   decoration: InputDecoration(labelText: 'Leader Age'),
                 ),
-                TextFormField(
-                  controller: barangayController,
-                  decoration: InputDecoration(labelText: 'Barangay'),
+                DropdownButtonFormField<String>(
+                  decoration: InputDecoration(labelText: 'Leader Barangay'),
+                  value: widget.barangayNames.isNotEmpty
+                      ? widget.barangayNames[0]
+                      : null,
+                  items: widget.barangayNames.map((String barangayName) {
+                    return DropdownMenuItem<String>(
+                      value: barangayName,
+                      child: Text(barangayName),
+                    );
+                  }).toList(),
+                  onChanged: (selectedBarangay) {
+                    setState(() {
+                      barangayController.text = selectedBarangay ?? '';
+                    });
+                  },
                 ),
-                TextFormField(
-                  controller: civilStatusController,
+                DropdownButtonFormField<String>(
                   decoration: InputDecoration(labelText: 'Leader Civil Status'),
+                  value: selectedCivilStatus,
+                  items: [
+                    DropdownMenuItem(
+                      value: 'Single',
+                      child: Text('Single'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'Married',
+                      child: Text('Married'),
+                    ),
+                  ],
+                  onChanged: (selectedItem) {
+                    setState(() {
+                      selectedCivilStatus = selectedItem;
+                      civilStatusController.text =
+                          selectedItem!; // Update leaderPositionController
+                    });
+                  },
                 ),
+
                 TextFormField(
                   controller: famMembersController,
                   decoration:

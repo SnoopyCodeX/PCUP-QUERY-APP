@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:query_app/online/main.dart';
-import 'package:query_app/online/signup.dart'; // Import the signup screen file
+
+import 'package:query_app/online/signup.dart';
+
+import 'main.dart';
 
 void main() => runApp(MaterialApp(
-      home: LoginScreen(userData: {}),
+      home: ScaffoldMessenger(
+        child: LoginScreen(userData: {}),
+      ),
     ));
 
 class LoginScreen extends StatefulWidget {
@@ -24,16 +28,18 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text('Login Screen'),
+      ),
       body: ListView(
-        // Use a ListView to make the content scrollable
         children: [
           Container(
-            margin: EdgeInsets.only(top: 170, bottom: 20), // Add top margin
+            margin: EdgeInsets.only(top: 170, bottom: 20),
             child: Center(
               child: CircleAvatar(
                 radius: 50,
-                backgroundImage: AssetImage('assets/images/download.png'),
                 // Provide the path to your image asset
+                backgroundImage: AssetImage('assets/images/download.png'),
               ),
             ),
           ),
@@ -82,28 +88,24 @@ class _LoginScreenState extends State<LoginScreen> {
                         body: json.encode(
                             {'user_name': username, 'user_password': password}),
                       );
-                      print(response.body);
-                      String responseBody =
-                          response.body; // Extract the response body
-                      String errorMessage =
-                          ''; // Initialize the error message variable
+                      print("Response Body: ${response.body}");
+                      print("Status Code: ${response.statusCode}");
 
                       if (response.statusCode == 200) {
                         var data = json.decode(response.body);
+                        String responseBody = response.body;
+                        String errorMessage = '';
 
                         if (data.containsKey('user_id')) {
-                          // User is logged in; store user data and navigate to the main screen
-                          Map<String, dynamic> userData =
-                              data; // Store user data
+                          Map<String, dynamic> userData = data;
                           if (userData['user_remarks'] == 'APPROVED') {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: Text('Successfuly Login'),
+                                content: Text('Successfully Login'),
                                 duration: Duration(seconds: 3),
                               ),
                             );
 
-                            // Delay the navigation to the login screen for 5 seconds
                             Future.delayed(Duration(seconds: 3), () {
                               Navigator.pushReplacement(
                                 context,
@@ -113,13 +115,14 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ),
                               );
                             });
-                          } else if (responseBody
-                              .contains('Login failed. User not approved.')) {
+                          }
+                          if (responseBody
+                              .contains('Login failed. User not approved')) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content:
                                     Text("Login failed. User not approved."),
-                                duration: Duration(seconds: 2),
+                                duration: Duration(seconds: 5),
                               ),
                             );
                           }
@@ -129,12 +132,11 @@ class _LoginScreenState extends State<LoginScreen> {
                             SnackBar(
                               content:
                                   Text("Login failed. Invalid credentials."),
-                              duration: Duration(seconds: 2),
+                              duration: Duration(seconds: 5),
                             ),
                           );
                         }
                       } else {
-                        // Handle the API response status code (e.g., show an error message)
                         print(
                             "API Error - Status Code: ${response.statusCode}");
                       }

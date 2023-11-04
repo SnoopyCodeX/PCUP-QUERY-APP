@@ -271,9 +271,10 @@ class _AccreditationScreenState extends State<AccreditationScreen> {
   @override
   Widget build(BuildContext context) {
     final userData = widget.userData;
+
     return Scaffold(
       appBar: AppBar(
-        title: Text('Home Screen'),
+        title: Text('Accreditation'),
       ),
       drawer: Drawer(
         child: ListView(

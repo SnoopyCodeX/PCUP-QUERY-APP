@@ -101,7 +101,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final userData = widget.userData;
     return Scaffold(
       appBar: AppBar(
-        title: Text('Home Screen'),
+        title: Text('Settings'),
       ),
       drawer: Drawer(
         child: ListView(

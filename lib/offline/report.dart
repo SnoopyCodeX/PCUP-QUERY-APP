@@ -99,7 +99,7 @@ class _ReportScreenState extends State<ReportScreen> {
     final userData = widget.userData;
     return Scaffold(
       appBar: AppBar(
-        title: Text('Home Screen'),
+        title: Text('Reports'),
       ),
       drawer: Drawer(
         child: ListView(

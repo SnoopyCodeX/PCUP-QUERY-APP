@@ -375,7 +375,7 @@ class _houseHoldScreenState extends State<houseHoldScreen> {
     final userData = widget.userData;
     return Scaffold(
       appBar: AppBar(
-        title: Text('Home Screen'),
+        title: Text('Household'),
       ),
       drawer: Drawer(
         child: ListView(
