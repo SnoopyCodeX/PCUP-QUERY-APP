@@ -73,8 +73,8 @@ class _houseHoldScreenState extends State<houseHoldScreen> {
   }
 
   Future<void> fetchHousehold() async {
-    final Uri apiUrl =
-        Uri.parse('http://linkmopakipastediri/pcup-api/online/fetch_household.php');
+    final Uri apiUrl = Uri.parse(
+        'http://sweet-salvador.kenkarlo.com/PCUP-API/online/fetch_household.php');
     try {
       final response = await http.get(apiUrl);
 
@@ -101,7 +101,7 @@ class _houseHoldScreenState extends State<houseHoldScreen> {
 
   Future<void> fetchBarangayNames() async {
     final Uri apiUrl = Uri.parse(
-        'http://linkmopakipastediri/pcup-api/online/fetch_baranggayName.php');
+        'http://sweet-salvador.kenkarlo.com/PCUP-API/online/fetch_baranggayName.php');
     try {
       final response = await http.get(apiUrl);
 
@@ -130,7 +130,7 @@ class _houseHoldScreenState extends State<houseHoldScreen> {
 
   Future<void> fetchAccreditationNames() async {
     final Uri apiUrl = Uri.parse(
-        'http://linkmopakipastediri/pcup-api/online/fetch_householdLeader.php');
+        'http://sweet-salvador.kenkarlo.com/PCUP-API/online/fetch_householdLeader.php');
     try {
       final response = await http.get(apiUrl);
 
@@ -277,8 +277,8 @@ class _houseHoldScreenState extends State<houseHoldScreen> {
   }
 
   void _submitData() async {
-    final apiUrl =
-        Uri.parse('http://linkmopakipastediri/pcup-api/online/add_household.php');
+    final apiUrl = Uri.parse(
+        'http://sweet-salvador.kenkarlo.com/PCUP-API/online/add_household.php');
     final response = await http.post(
       apiUrl,
       body: {
@@ -329,7 +329,6 @@ class _houseHoldScreenState extends State<houseHoldScreen> {
   String? selectedleaderRelation;
   String? selectRemarks;
 
-  
   Future<void> _selectDateBD(BuildContext context) async {
     final DateTime picked = (await showDatePicker(
       context: context,

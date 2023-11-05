@@ -1,16 +1,26 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-
+import 'package:http/io_client.dart';
 import 'package:query_app/online/signup.dart';
 
 import 'main.dart';
 
-void main() => runApp(MaterialApp(
-      home: ScaffoldMessenger(
-        child: LoginScreen(userData: {}),
-      ),
-    ));
+void main() {
+  // Create an IOClient that doesn't validate SSL certificates.
+  var httpClient = new HttpClient();
+  httpClient.badCertificateCallback =
+      (X509Certificate cert, String host, int port) => true;
+  var ioClient = new IOClient(httpClient);
+
+  runApp(MaterialApp(
+    home: ScaffoldMessenger(
+      child: LoginScreen(userData: {}),
+    ),
+  ));
+}
 
 class LoginScreen extends StatefulWidget {
   final Map<String, dynamic> userData;
@@ -81,7 +91,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       String password = passwordController.text;
 
                       var url = Uri.parse(
-                          'http://sweet-salvador.kenkarlo.com/lib/login.php');
+                          'http://sweet-salvador.kenkarlo.com/PCUP-API/online/login.php');
                       var response = await http.post(
                         url,
                         headers: {'Content-Type': 'application/json'},
