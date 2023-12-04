@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:query_app/main.dart';
 import 'dart:convert';
-import 'package:query_app/online/login.dart';
+import 'package:query_app/online/main.dart';
 
 class SignUpScreen extends StatefulWidget {
   @override

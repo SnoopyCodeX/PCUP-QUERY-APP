@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:query_app/main.dart';
-import 'package:query_app/online/login.dart';
+
 import 'package:query_app/online/report.dart';
 import 'package:query_app/online/accreditation.dart';
 import 'package:query_app/online/household.dart';
@@ -91,8 +91,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) =>
-                    FolderSelectionScreen(userData: widget.userData)));
+                builder: (context) => LoginScreen(userData: widget.userData)));
         break;
     }
   }

@@ -229,8 +229,7 @@ class _houseHoldScreenState extends State<houseHoldScreen> {
         Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) =>
-                    FolderSelectionScreen(userData: widget.userData)));
+                builder: (context) => LoginScreen(userData: widget.userData)));
         break;
     }
   }

@@ -5,7 +5,6 @@ import 'package:query_app/online/report.dart';
 import 'package:query_app/online/leaders_members.dart';
 import 'package:query_app/online/accreditation.dart';
 import 'package:query_app/online/household.dart';
-import 'package:query_app/online/login.dart';
 
 void main() {
   runApp(MyApp());
@@ -111,7 +110,7 @@ class _MyHomePageState extends State<MyHomePageOnline> {
         Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => FolderSelectionScreen(userData: widget.userData)));
+                builder: (context) => LoginScreen(userData: widget.userData)));
         break;
     }
   }

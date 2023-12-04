@@ -6,7 +6,6 @@ import 'package:query_app/online/settings.dart';
 import 'package:query_app/online/report.dart';
 import 'package:query_app/online/accreditation.dart';
 import 'package:query_app/online/household.dart';
-import 'package:query_app/online/login.dart';
 import 'package:query_app/online/main.dart';
 
 class LeadersScreen extends StatefulWidget {
@@ -194,8 +193,7 @@ class _LeadersScreenState extends State<LeadersScreen> {
         Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) =>
-                    FolderSelectionScreen(userData: widget.userData)));
+                builder: (context) => LoginScreen(userData: widget.userData)));
         break;
     }
   }
@@ -208,14 +206,6 @@ class _LeadersScreenState extends State<LeadersScreen> {
         barangayController.text.isNotEmpty &&
         civilStatusController.text.isNotEmpty &&
         famMembersController.text.isNotEmpty &&
-        totalMaleController.text.isNotEmpty &&
-        totalFemaleController.text.isNotEmpty &&
-        pwdMaleController.text.isNotEmpty &&
-        pwdFemaleController.text.isNotEmpty &&
-        srFemaleController.text.isNotEmpty &&
-        srMaleController.text.isNotEmpty &&
-        minorFemaleController.text.isNotEmpty &&
-        minorMaleController.text.isNotEmpty &&
         remarksController.text.isNotEmpty;
   }
 

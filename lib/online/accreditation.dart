@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:query_app/main.dart';
-import 'package:query_app/online/login.dart';
+import 'package:query_app/online/main.dart';
 import 'dart:convert';
 import 'package:query_app/online/settings.dart';
 import 'package:query_app/online/report.dart';
@@ -487,7 +487,7 @@ class _AccreditationScreenState extends State<AccreditationScreen> {
             context,
             MaterialPageRoute(
                 builder: (context) =>
-                    FolderSelectionScreen(userData: widget.userData)));
+                    LoginScreen(userData: widget.userData)));
         break;
     }
   }
