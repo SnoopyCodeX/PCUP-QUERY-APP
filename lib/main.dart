@@ -83,7 +83,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       String password = passwordController.text;
 
                       var url = Uri.parse(
-                          'http://sweet-salvador.kenkarlo.com/PCUP-API/online/login.php');
+                          'https://sweet-salvador.kenkarlo.com/PCUP-API/online/login.php');
                       var response = await http.post(
                         url,
                         headers: {'Content-Type': 'application/json'},

@@ -85,7 +85,7 @@ class _ReportScreenState extends State<ReportScreen> {
 
   Future<void> fetchBarangayNames() async {
     final Uri apiUrl = Uri.parse(
-        'http://sweet-salvador.kenkarlo.com/PCUP-API/online/fetch_baranggayName.php');
+        'https://sweet-salvador.kenkarlo.com/PCUP-API/online/fetch_baranggayName.php');
     try {
       final response = await http.get(apiUrl);
 
@@ -114,7 +114,7 @@ class _ReportScreenState extends State<ReportScreen> {
 
   Future<void> fetchBarangayCrimeNames() async {
     final Uri apiUrl = Uri.parse(
-        'http://sweet-salvador.kenkarlo.com/PCUP-API/online/fetch_baranggayName.php');
+        'https://sweet-salvador.kenkarlo.com/PCUP-API/online/fetch_baranggayName.php');
     try {
       final response = await http.get(apiUrl);
 
@@ -276,7 +276,7 @@ class _ReportScreenState extends State<ReportScreen> {
 
   void _submitReport() async {
     final apiUrl = Uri.parse(
-        'http://sweet-salvador.kenkarlo.com/PCUP-API/online/add_report.php');
+        'https://sweet-salvador.kenkarlo.com/PCUP-API/online/add_report.php');
     final response = await http.post(
       apiUrl,
       body: {
@@ -311,7 +311,7 @@ class _ReportScreenState extends State<ReportScreen> {
 
   void _submitCrime() async {
     final apiUrl = Uri.parse(
-        'http://sweet-salvador.kenkarlo.com/PCUP-API/online/add_crime.php');
+        'https://sweet-salvador.kenkarlo.com/PCUP-API/online/add_crime.php');
     final response = await http.post(
       apiUrl,
       body: {

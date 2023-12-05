@@ -69,7 +69,7 @@ class _AccreditationScreenState extends State<AccreditationScreen> {
 
   Future<void> fetchAccreditations() async {
     final Uri apiUrl = Uri.parse(
-        'http://sweet-salvador.kenkarlo.com/PCUP-API/online/fetch_accreditations.php');
+        'https://sweet-salvador.kenkarlo.com/PCUP-API/online/fetch_accreditations.php');
     try {
       final response = await http.get(apiUrl);
 
@@ -96,7 +96,7 @@ class _AccreditationScreenState extends State<AccreditationScreen> {
 
   Future<void> fetchBarangayNames() async {
     final Uri apiUrl = Uri.parse(
-        'http://sweet-salvador.kenkarlo.com/PCUP-API/online/fetch_baranggayName.php');
+        'https://sweet-salvador.kenkarlo.com/PCUP-API/online/fetch_baranggayName.php');
     try {
       final response = await http.get(apiUrl);
 
@@ -383,7 +383,7 @@ class _AccreditationScreenState extends State<AccreditationScreen> {
 // ...
   void _submitData() async {
     final apiUrl = Uri.parse(
-        'http://sweet-salvador.kenkarlo.com/PCUP-API/online/add_accreditation.php');
+        'https://sweet-salvador.kenkarlo.com/PCUP-API/online/add_accreditation.php');
     final response = await http.post(
       apiUrl,
       body: {
@@ -486,8 +486,7 @@ class _AccreditationScreenState extends State<AccreditationScreen> {
         Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) =>
-                    LoginScreen(userData: widget.userData)));
+                builder: (context) => LoginScreen(userData: widget.userData)));
         break;
     }
   }

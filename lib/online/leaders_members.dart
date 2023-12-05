@@ -67,7 +67,7 @@ class _LeadersScreenState extends State<LeadersScreen> {
 
   Future<void> fetchLeaders() async {
     final Uri apiUrl = Uri.parse(
-        'http://sweet-salvador.kenkarlo.com/PCUP-API/online/fetch_leaders.php');
+        'https://sweet-salvador.kenkarlo.com/PCUP-API/online/fetch_leaders.php');
     try {
       final response = await http.get(apiUrl);
 
@@ -94,7 +94,7 @@ class _LeadersScreenState extends State<LeadersScreen> {
 
   Future<void> fetchBarangayNames() async {
     final Uri apiUrl = Uri.parse(
-        'http://sweet-salvador.kenkarlo.com/PCUP-API/online/fetch_baranggayName.php');
+        'https://sweet-salvador.kenkarlo.com/PCUP-API/online/fetch_baranggayName.php');
     try {
       final response = await http.get(apiUrl);
 
@@ -231,7 +231,7 @@ class _LeadersScreenState extends State<LeadersScreen> {
 
   void _submitData() async {
     final apiUrl = Uri.parse(
-        'http://sweet-salvador.kenkarlo.com/PCUP-API/online/add_leaders.php');
+        'https://sweet-salvador.kenkarlo.com/PCUP-API/online/add_leaders.php');
     final response = await http.post(
       apiUrl,
       body: {

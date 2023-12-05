@@ -74,7 +74,7 @@ class _houseHoldScreenState extends State<houseHoldScreen> {
 
   Future<void> fetchHousehold() async {
     final Uri apiUrl = Uri.parse(
-        'http://sweet-salvador.kenkarlo.com/PCUP-API/online/fetch_household.php');
+        'https://sweet-salvador.kenkarlo.com/PCUP-API/online/fetch_household.php');
     try {
       final response = await http.get(apiUrl);
 
@@ -101,7 +101,7 @@ class _houseHoldScreenState extends State<houseHoldScreen> {
 
   Future<void> fetchBarangayNames() async {
     final Uri apiUrl = Uri.parse(
-        'http://sweet-salvador.kenkarlo.com/PCUP-API/online/fetch_baranggayName.php');
+        'https://sweet-salvador.kenkarlo.com/PCUP-API/online/fetch_baranggayName.php');
     try {
       final response = await http.get(apiUrl);
 
@@ -130,7 +130,7 @@ class _houseHoldScreenState extends State<houseHoldScreen> {
 
   Future<void> fetchAccreditationNames() async {
     final Uri apiUrl = Uri.parse(
-        'http://sweet-salvador.kenkarlo.com/PCUP-API/online/fetch_householdLeader.php');
+        'https://sweet-salvador.kenkarlo.com/PCUP-API/online/fetch_householdLeader.php');
     try {
       final response = await http.get(apiUrl);
 
@@ -277,7 +277,7 @@ class _houseHoldScreenState extends State<houseHoldScreen> {
 
   void _submitData() async {
     final apiUrl = Uri.parse(
-        'http://sweet-salvador.kenkarlo.com/PCUP-API/online/add_household.php');
+        'https://sweet-salvador.kenkarlo.com/PCUP-API/online/add_household.php');
     final response = await http.post(
       apiUrl,
       body: {
