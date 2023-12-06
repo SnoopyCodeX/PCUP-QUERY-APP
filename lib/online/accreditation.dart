@@ -1,28 +1,34 @@
+// ignore_for_file: non_constant_identifier_names
+
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:query_app/main.dart';
-import 'package:query_app/online/main.dart';
-import 'dart:convert';
-import 'package:query_app/online/settings.dart';
-import 'package:query_app/online/report.dart';
-import 'package:query_app/online/leaders_members.dart';
 import 'package:query_app/online/household.dart';
+import 'package:query_app/online/leaders_members.dart';
 import 'package:query_app/online/main.dart';
+import 'package:query_app/online/report.dart';
+import 'package:query_app/online/settings.dart';
+import 'package:query_app/source/accreditation_data_source.dart';
 
 class AccreditationScreen extends StatefulWidget {
   final Map<String, dynamic> userData;
 
-  AccreditationScreen({required this.userData});
-  List<String> barangayNames = [];
+  const AccreditationScreen({Key? key, required this.userData}) : super(key: key);
+
   @override
-  _AccreditationScreenState createState() =>
-      _AccreditationScreenState(userData: userData);
+  State<AccreditationScreen> createState() => _AccreditationScreenState();
 }
 
 class _AccreditationScreenState extends State<AccreditationScreen> {
-  final Map<String, dynamic> userData;
+  final ROWS_PER_PAGE = 8;
+
+  Map<String, dynamic>? userData;
   List<Map<String, dynamic>> accreditations = [];
+  List<String> barangayNames = [];
   String message = '';
+
   TextEditingController nameController = TextEditingController();
   TextEditingController barangayController = TextEditingController();
   TextEditingController addressController = TextEditingController();
@@ -38,7 +44,7 @@ class _AccreditationScreenState extends State<AccreditationScreen> {
   TextEditingController probelmsController = TextEditingController();
   TextEditingController officerController = TextEditingController();
   TextEditingController remarksController = TextEditingController();
-  _AccreditationScreenState({required this.userData});
+
   @override
   void dispose() {
     nameController.dispose();
@@ -63,13 +69,15 @@ class _AccreditationScreenState extends State<AccreditationScreen> {
   @override
   void initState() {
     super.initState();
+
+    userData = widget.userData;
+
     fetchBarangayNames();
     fetchAccreditations();
   }
 
   Future<void> fetchAccreditations() async {
-    final Uri apiUrl = Uri.parse(
-        'https://sweet-salvador.kenkarlo.com/PCUP-API/online/fetch_accreditations.php');
+    final Uri apiUrl = Uri.parse('https://sweet-salvador.kenkarlo.com/PCUP-API/online/fetch_accreditations.php');
     try {
       final response = await http.get(apiUrl);
 
@@ -82,21 +90,20 @@ class _AccreditationScreenState extends State<AccreditationScreen> {
           });
         } else {
           // Handle the case where the API did not return a JSON array as expected.
-          print('API did not return valid JSON data.');
+          debugPrint('API did not return valid JSON data.');
         }
       } else {
         // Handle non-200 status codes, indicating an API error.
-        print('API Error: Status Code ${response.statusCode}');
+        debugPrint('API Error: Status Code ${response.statusCode}');
       }
     } catch (e) {
       // Handle exceptions, such as network errors or invalid JSON data.
-      print('Error fetching data: $e');
+      debugPrint('Error fetching data: $e');
     }
   }
 
   Future<void> fetchBarangayNames() async {
-    final Uri apiUrl = Uri.parse(
-        'https://sweet-salvador.kenkarlo.com/PCUP-API/online/fetch_baranggayName.php');
+    final Uri apiUrl = Uri.parse('https://sweet-salvador.kenkarlo.com/PCUP-API/online/fetch_baranggayName.php');
     try {
       final response = await http.get(apiUrl);
 
@@ -110,16 +117,17 @@ class _AccreditationScreenState extends State<AccreditationScreen> {
           }).toList();
 
           setState(() {
-            widget.barangayNames = names;
+            barangayNames.clear();
+            barangayNames.addAll(names);
           });
         } else {
-          print('API did not return valid JSON data.');
+          debugPrint('API did not return valid JSON data.');
         }
       } else {
-        print('API Error: Status Code ${response.statusCode}');
+        debugPrint('API Error: Status Code ${response.statusCode}');
       }
     } catch (e) {
-      print('Error fetching barangay names: $e');
+      debugPrint('Error fetching barangay names: $e');
     }
   }
 
@@ -169,7 +177,7 @@ class _AccreditationScreenState extends State<AccreditationScreen> {
       lastDate: DateTime(2101),
     ))!;
 
-    if (picked != null && picked != selectIssueDate) {
+    if (picked != selectIssueDate) {
       setState(() {
         selectIssueDate = picked;
         dateIsusuedController.text = picked.toLocal().toString().split(' ')[0];
@@ -185,7 +193,7 @@ class _AccreditationScreenState extends State<AccreditationScreen> {
       lastDate: DateTime(2101),
     ))!;
 
-    if (picked != null && picked != selectExpirationDate) {
+    if (picked != selectExpirationDate) {
       setState(() {
         selectExpirationDate = picked;
         expirationController.text = picked.toLocal().toString().split(' ')[0];
@@ -195,7 +203,7 @@ class _AccreditationScreenState extends State<AccreditationScreen> {
 
   Widget _buildModalContent(BuildContext context) {
     return AlertDialog(
-      title: Text("Add Accreditation"),
+      title: const Text("Add Accreditation"),
       content: SingleChildScrollView(
         // Wrap the content in a SingleChildScrollView to make it scrollable
         child: Column(
@@ -204,14 +212,12 @@ class _AccreditationScreenState extends State<AccreditationScreen> {
             // Input fields
             TextField(
               controller: nameController,
-              decoration: InputDecoration(labelText: 'Name of Organization'),
+              decoration: const InputDecoration(labelText: 'Name of Organization'),
             ),
             DropdownButtonFormField<String>(
-              decoration: InputDecoration(labelText: 'Household Barangay'),
-              value: widget.barangayNames.isNotEmpty
-                  ? widget.barangayNames[0]
-                  : null,
-              items: widget.barangayNames.map((String barangayName) {
+              decoration: const InputDecoration(labelText: 'Household Barangay'),
+              value: barangayNames.isNotEmpty ? barangayNames[0] : null,
+              items: barangayNames.map((String barangayName) {
                 return DropdownMenuItem<String>(
                   value: barangayName,
                   child: Text(barangayName),
@@ -225,15 +231,15 @@ class _AccreditationScreenState extends State<AccreditationScreen> {
             ),
             TextField(
               controller: addressController,
-              decoration: InputDecoration(labelText: 'Address'),
+              decoration: const InputDecoration(labelText: 'Address'),
             ),
             TextField(
               controller: contactPersonController,
-              decoration: InputDecoration(labelText: 'Contact Person'),
+              decoration: const InputDecoration(labelText: 'Contact Person'),
             ),
             TextFormField(
               controller: dateIsusuedController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'Date Issued',
                 hintText: 'Select date',
                 labelStyle: TextStyle(color: Colors.grey),
@@ -248,7 +254,7 @@ class _AccreditationScreenState extends State<AccreditationScreen> {
             ),
             TextFormField(
               controller: expirationController,
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: 'Expiration',
                 hintText: 'Select date',
                 labelStyle: TextStyle(color: Colors.grey),
@@ -263,41 +269,40 @@ class _AccreditationScreenState extends State<AccreditationScreen> {
             ),
             TextField(
               controller: accreditationController,
-              decoration: InputDecoration(labelText: 'Accreditation Number'),
+              decoration: const InputDecoration(labelText: 'Accreditation Number'),
             ),
             TextField(
               controller: phoneController,
-              decoration: InputDecoration(labelText: 'Phone Number'),
+              decoration: const InputDecoration(labelText: 'Phone Number'),
             ),
             TextField(
               controller: organizationController,
-              decoration: InputDecoration(labelText: 'Organization President'),
+              decoration: const InputDecoration(labelText: 'Organization President'),
             ),
             TextField(
               controller: sizeAreaController,
-              decoration:
-                  InputDecoration(labelText: 'Size Area Of Organization'),
+              decoration: const InputDecoration(labelText: 'Size Area Of Organization'),
             ),
             TextField(
               controller: classificationController,
-              decoration: InputDecoration(labelText: 'Classification'),
+              decoration: const InputDecoration(labelText: 'Classification'),
             ),
             TextField(
               controller: programsController,
-              decoration: InputDecoration(labelText: 'Programs Availed'),
+              decoration: const InputDecoration(labelText: 'Programs Availed'),
             ),
             TextField(
               controller: probelmsController,
-              decoration: InputDecoration(labelText: 'Common Problems'),
+              decoration: const InputDecoration(labelText: 'Common Problems'),
             ),
             TextField(
               controller: officerController,
-              decoration: InputDecoration(labelText: 'Accreditation Officer'),
+              decoration: const InputDecoration(labelText: 'Accreditation Officer'),
             ),
             DropdownButtonFormField<String>(
-              decoration: InputDecoration(labelText: 'Remarks'),
+              decoration: const InputDecoration(labelText: 'Remarks'),
               value: selectRemarks,
-              items: [
+              items: const [
                 DropdownMenuItem(
                   value: 'NEW',
                   child: Text('NEW'),
@@ -306,8 +311,7 @@ class _AccreditationScreenState extends State<AccreditationScreen> {
               onChanged: (selectedItem) {
                 setState(() {
                   selectRemarks = selectedItem;
-                  remarksController.text =
-                      selectedItem!; // Update leaderPositionController
+                  remarksController.text = selectedItem!; // Update leaderPositionController
                 });
               },
             ),
@@ -317,9 +321,10 @@ class _AccreditationScreenState extends State<AccreditationScreen> {
       actions: <Widget>[
         TextButton(
           onPressed: () {
+            clearTextControllers();
             Navigator.of(context).pop(); // Close the dialog
           },
-          child: Text("Cancel"),
+          child: const Text("Cancel"),
         ),
         TextButton(
           onPressed: () {
@@ -330,14 +335,192 @@ class _AccreditationScreenState extends State<AccreditationScreen> {
               _showRequiredFieldsAlert(context);
             }
           },
-          child: Text("Insert"),
+          child: const Text("Insert"),
         ),
       ],
     );
   }
 
-  Widget _buildListTile(
-      String title, IconData iconData, double fontSize, VoidCallback onTap) {
+  void clearTextControllers() {
+    nameController.clear();
+    barangayController.clear();
+    addressController.clear();
+    contactPersonController.clear();
+    dateIsusuedController.clear();
+    expirationController.clear();
+    accreditationController.clear();
+    phoneController.clear();
+    organizationController.clear();
+    sizeAreaController.clear();
+    classificationController.clear();
+    programsController.clear();
+    probelmsController.clear();
+    officerController.clear();
+    remarksController.clear();
+  }
+
+  Widget _buildEditModalContent(BuildContext context, int index) {
+    nameController = TextEditingController(text: accreditations[index]['accreditation_name'].toString());
+    barangayController = TextEditingController(text: accreditations[index]['accreditation_barangay'].toString());
+    addressController = TextEditingController(text: accreditations[index]['accreditation_address'].toString());
+    contactPersonController = TextEditingController(text: accreditations[index]['accreditation_contactperson'].toString());
+    dateIsusuedController = TextEditingController(text: accreditations[index]['accreditation_issued'].toString());
+    expirationController = TextEditingController(text: accreditations[index]['accreditation_expired'].toString());
+    accreditationController = TextEditingController(text: accreditations[index]['accreditation_number'].toString());
+    phoneController = TextEditingController(text: accreditations[index]['accreditation_phone'].toString());
+    organizationController = TextEditingController(text: accreditations[index]['accreditation_president'].toString());
+    sizeAreaController = TextEditingController(text: accreditations[index]['accreditation_area'].toString());
+    classificationController = TextEditingController(text: accreditations[index]['accreditation_type'].toString());
+    programsController = TextEditingController(text: accreditations[index]['accreditation_programs'].toString());
+    probelmsController = TextEditingController(text: accreditations[index]['accreditation_problems'].toString());
+    officerController = TextEditingController(text: accreditations[index]['accreditation_coordinator'].toString());
+    remarksController = TextEditingController(text: accreditations[index]['accreditation_remarks'].toString());
+    selectRemarks = accreditations[index]['accreditation_remarks'].toString();
+
+    return AlertDialog(
+      title: const Text("Edit Accreditation"),
+      content: SingleChildScrollView(
+        // Wrap the content in a SingleChildScrollView to make it scrollable
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            // Input fields
+            TextField(
+              controller: nameController,
+              decoration: const InputDecoration(labelText: 'Name of Organization'),
+            ),
+            DropdownButtonFormField<String>(
+              decoration: const InputDecoration(labelText: 'Household Barangay'),
+              value: barangayNames.isNotEmpty ? barangayNames[0] : null,
+              items: barangayNames.map((String barangayName) {
+                return DropdownMenuItem<String>(
+                  value: barangayName,
+                  child: Text(barangayName),
+                );
+              }).toList(),
+              onChanged: (selectedBarangay) {
+                setState(() {
+                  barangayController.text = selectedBarangay ?? '';
+                });
+              },
+            ),
+            TextField(
+              controller: addressController,
+              decoration: const InputDecoration(labelText: 'Address'),
+            ),
+            TextField(
+              controller: contactPersonController,
+              decoration: const InputDecoration(labelText: 'Contact Person'),
+            ),
+            TextFormField(
+              controller: dateIsusuedController,
+              decoration: const InputDecoration(
+                labelText: 'Date Issued',
+                hintText: 'Select date',
+                labelStyle: TextStyle(color: Colors.grey),
+                hintStyle: TextStyle(color: Colors.black),
+                prefixIcon: Icon(Icons.calendar_today, color: Colors.blue),
+                border: InputBorder.none,
+                focusedBorder: InputBorder.none,
+              ),
+              onTap: () {
+                _selectIssueDate(context);
+              },
+            ),
+            TextFormField(
+              controller: expirationController,
+              decoration: const InputDecoration(
+                labelText: 'Expiration',
+                hintText: 'Select date',
+                labelStyle: TextStyle(color: Colors.grey),
+                hintStyle: TextStyle(color: Colors.black),
+                prefixIcon: Icon(Icons.calendar_today, color: Colors.blue),
+                border: InputBorder.none,
+                focusedBorder: InputBorder.none,
+              ),
+              onTap: () {
+                _selectExpirationDate(context);
+              },
+            ),
+            TextField(
+              controller: accreditationController,
+              decoration: const InputDecoration(labelText: 'Accreditation Number'),
+            ),
+            TextField(
+              controller: phoneController,
+              decoration: const InputDecoration(labelText: 'Phone Number'),
+            ),
+            TextField(
+              controller: organizationController,
+              decoration: const InputDecoration(labelText: 'Organization President'),
+            ),
+            TextField(
+              controller: sizeAreaController,
+              decoration: const InputDecoration(labelText: 'Size Area Of Organization'),
+            ),
+            TextField(
+              controller: classificationController,
+              decoration: const InputDecoration(labelText: 'Classification'),
+            ),
+            TextField(
+              controller: programsController,
+              decoration: const InputDecoration(labelText: 'Programs Availed'),
+            ),
+            TextField(
+              controller: probelmsController,
+              decoration: const InputDecoration(labelText: 'Common Problems'),
+            ),
+            TextField(
+              controller: officerController,
+              decoration: const InputDecoration(labelText: 'Accreditation Officer'),
+            ),
+            DropdownButtonFormField<String>(
+              decoration: const InputDecoration(labelText: 'Remarks'),
+              value: selectRemarks,
+              items: const [
+                DropdownMenuItem(
+                  value: 'NEW',
+                  child: Text('NEW'),
+                ),
+                DropdownMenuItem(
+                  value: 'APPROVED',
+                  child: Text('APPROVED'),
+                ),
+              ],
+              onChanged: (selectedItem) {
+                setState(() {
+                  selectRemarks = selectedItem;
+                  remarksController.text = selectedItem!; // Update leaderPositionController
+                });
+              },
+            ),
+          ],
+        ),
+      ),
+      actions: <Widget>[
+        TextButton(
+          onPressed: () {
+            clearTextControllers();
+            Navigator.of(context).pop(); // Close the dialog
+          },
+          child: const Text("Cancel"),
+        ),
+        TextButton(
+          onPressed: () {
+            if (_validateFields()) {
+              _submitUpdatedData(index);
+              Navigator.of(context).pop(); // Close the dialog
+            } else {
+              _showRequiredFieldsAlert(context);
+            }
+          },
+          child: const Text("Update"),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildListTile(String title, IconData iconData, double fontSize, VoidCallback onTap) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
       child: Card(
@@ -365,14 +548,14 @@ class _AccreditationScreenState extends State<AccreditationScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text("Required Fields"),
-          content: Text("Please fill in all required fields."),
+          title: const Text("Required Fields"),
+          content: const Text("Please fill in all required fields."),
           actions: <Widget>[
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop(); // Close the alert
               },
-              child: Text("OK"),
+              child: const Text("OK"),
             ),
           ],
         );
@@ -382,8 +565,7 @@ class _AccreditationScreenState extends State<AccreditationScreen> {
 
 // ...
   void _submitData() async {
-    final apiUrl = Uri.parse(
-        'https://sweet-salvador.kenkarlo.com/PCUP-API/online/add_accreditation.php');
+    final apiUrl = Uri.parse('https://sweet-salvador.kenkarlo.com/PCUP-API/online/add_accreditation.php');
     final response = await http.post(
       apiUrl,
       body: {
@@ -404,35 +586,67 @@ class _AccreditationScreenState extends State<AccreditationScreen> {
         'accreditation_remarks': remarksController.text,
       },
     );
-    print(response.body);
+    debugPrint(response.body);
     if (response.statusCode == 200) {
       fetchAccreditations();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Successfully Added'),
-        ),
-      );
-      nameController.clear();
-      addressController.clear();
-      barangayController.clear();
-      contactPersonController.clear();
-      dateIsusuedController.clear();
-      expirationController.clear();
-      accreditationController.clear();
-      phoneController.clear();
-      organizationController.clear();
-      sizeAreaController.clear();
-      classificationController.clear();
-      probelmsController.clear();
-      programsController.clear();
-      officerController.clear();
-      remarksController.clear();
+
+      WidgetsBinding.instance.addPostFrameCallback((_) => ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Successfully Added'),
+            ),
+          ));
+
+      clearTextControllers();
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Failed to submit data'),
-        ),
-      );
+      WidgetsBinding.instance.addPostFrameCallback((_) => ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Failed to submit data'),
+            ),
+          ));
+    }
+  }
+
+  void _submitUpdatedData(int index) async {
+    final apiUrl = Uri.parse('https://sweet-salvador.kenkarlo.com/PCUP-API/online/update_accreditation.php');
+    final response = await http.post(
+      apiUrl,
+      body: {
+        'accreditation_id': accreditations[index]['accreditation_id'],
+        'accreditation_name': nameController.text,
+        'accreditation_barangay': barangayController.text,
+        'accreditation_address': addressController.text,
+        'accreditation_contactperson': contactPersonController.text,
+        'accreditation_issued': dateIsusuedController.text,
+        'accreditation_expired': expirationController.text,
+        'accreditation_number': accreditationController.text,
+        'accreditation_phone': phoneController.text,
+        'accreditation_president': organizationController.text,
+        'accreditation_area': sizeAreaController.text,
+        'accreditation_class': classificationController.text,
+        'accreditation_programs': programsController.text,
+        'accreditation_problems': probelmsController.text,
+        'accreditation_coordinator': officerController.text,
+        'accreditation_remarks': remarksController.text,
+      },
+    );
+    debugPrint(response.body);
+    if (response.statusCode == 200) {
+      await fetchAccreditations();
+      setState(() {}); // Reload the screen to display the newly fetched data
+
+      WidgetsBinding.instance.addPostFrameCallback((_) => ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Successfully Updated'),
+            ),
+          ));
+
+      clearTextControllers();
+    } else {
+      WidgetsBinding.instance.addPostFrameCallback((_) => ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Failed to submit updated data'),
+            ),
+          ));
     }
   }
 // ...
@@ -441,11 +655,7 @@ class _AccreditationScreenState extends State<AccreditationScreen> {
     Navigator.of(context).pop(); // Close the sidebar
     switch (routeName) {
       case 'Home':
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) =>
-                    MyHomePageOnline(userData: widget.userData)));
+        Navigator.push(context, MaterialPageRoute(builder: (context) => MyHomePageOnline(userData: widget.userData)));
         break;
       case 'Accreditation':
         Navigator.push(
@@ -456,37 +666,19 @@ class _AccreditationScreenState extends State<AccreditationScreen> {
                     )));
         break;
       case 'Leaders and Members':
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) =>
-                    LeadersScreen(userData: widget.userData)));
+        Navigator.push(context, MaterialPageRoute(builder: (context) => LeadersScreen(userData: widget.userData)));
         break;
       case 'Household':
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) =>
-                    houseHoldScreen(userData: widget.userData)));
+        Navigator.push(context, MaterialPageRoute(builder: (context) => houseHoldScreen(userData: widget.userData)));
         break;
       case 'Report':
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => ReportScreen(userData: widget.userData)));
+        Navigator.push(context, MaterialPageRoute(builder: (context) => ReportScreen(userData: widget.userData)));
         break;
       case 'Settings':
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) =>
-                    SettingsScreen(userData: widget.userData)));
+        Navigator.push(context, MaterialPageRoute(builder: (context) => SettingsScreen(userData: widget.userData)));
         break;
       case 'Logout':
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => LoginScreen(userData: widget.userData)));
+        Navigator.push(context, MaterialPageRoute(builder: (context) => LoginScreen(userData: widget.userData)));
         break;
     }
   }
@@ -494,25 +686,25 @@ class _AccreditationScreenState extends State<AccreditationScreen> {
   @override
   Widget build(BuildContext context) {
     final userData = widget.userData;
-    final userImage = AssetImage('assets/images/avatar.png');
+    const userImage = AssetImage('assets/images/avatar.png');
     return Scaffold(
       appBar: AppBar(
-        title: Text('Accreditation'),
+        title: const Text('Accreditation'),
       ),
       drawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
           children: <Widget>[
             DrawerHeader(
-              decoration: BoxDecoration(color: Colors.white),
+              decoration: const BoxDecoration(color: Colors.white),
               child: SingleChildScrollView(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
                     Container(
                       width: double.infinity,
-                      padding: EdgeInsets.all(10),
+                      padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
                         color: Colors.blueAccent,
                         borderRadius: BorderRadius.circular(8),
@@ -520,24 +712,24 @@ class _AccreditationScreenState extends State<AccreditationScreen> {
                           BoxShadow(
                             color: Colors.black.withOpacity(0.3),
                             blurRadius: 3,
-                            offset: Offset(0, 2),
+                            offset: const Offset(0, 2),
                           ),
                         ],
                       ),
                       child: Column(
                         children: [
-                          CircleAvatar(
+                          const CircleAvatar(
                             radius: 30,
                             backgroundImage: userImage,
                           ),
                           Text(
                             '${userData['user_name']}',
-                            style: TextStyle(color: Colors.white, fontSize: 20),
+                            style: const TextStyle(color: Colors.white, fontSize: 20),
                           ),
-                          SizedBox(height: 5),
+                          const SizedBox(height: 5),
                           Text(
                             '${userData['user_email']}',
-                            style: TextStyle(color: Colors.white, fontSize: 16),
+                            style: const TextStyle(color: Colors.white, fontSize: 16),
                           ),
                         ],
                       ),
@@ -571,9 +763,48 @@ class _AccreditationScreenState extends State<AccreditationScreen> {
         ),
       ),
       body: SingleChildScrollView(
-        scrollDirection: Axis.vertical,
-        child: SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
+        child: PaginatedDataTable(
+          columns: const [
+            DataColumn(label: Text("accreditation_id")),
+            DataColumn(label: Text("accreditation_name")),
+            DataColumn(label: Text("accreditation_barangay")),
+            DataColumn(label: Text("BarangayID")),
+            DataColumn(label: Text("accreditation_address")),
+            DataColumn(label: Text("accreditation_contactperson")),
+            DataColumn(label: Text("accreditation_phone")),
+            DataColumn(label: Text("accreditation_number")),
+            DataColumn(label: Text("accreditation_issued")),
+            DataColumn(label: Text("accreditation_expired")),
+            DataColumn(label: Text("accreditation_president")),
+            DataColumn(label: Text("accreditation_type")),
+            DataColumn(label: Text("accreditation_ddress")),
+            DataColumn(label: Text("accreditation_members")),
+            DataColumn(label: Text("accreditation_population")),
+            DataColumn(label: Text("accreditation_belowm")),
+            DataColumn(label: Text("accreditation_belowf")),
+            DataColumn(label: Text("accreditation_belowo")),
+            DataColumn(label: Text("accreditation_abovem")),
+            DataColumn(label: Text("accreditation_abovef")),
+            DataColumn(label: Text("accreditation_aboveo")),
+            DataColumn(label: Text("accreditation_area")),
+            DataColumn(label: Text("accreditation_class")),
+            DataColumn(label: Text("accreditation_programs")),
+            DataColumn(label: Text("accreditation_problems")),
+            DataColumn(label: Text("accreditation_coordinator")),
+            DataColumn(label: Text("accreditation_created")),
+            DataColumn(label: Text("accreditation_remarks")),
+          ],
+          source: AccreditationDataSource(
+            data: accreditations,
+            onLongPress: (int selectedIndex) => showDialog(
+              context: context,
+              builder: (context) => _buildEditModalContent(context, selectedIndex),
+            ),
+          ),
+          rowsPerPage: accreditations.length < ROWS_PER_PAGE ? accreditations.length + 1 : ROWS_PER_PAGE,
+          header: const Center(
+            child: Text("Accreditations"),
+          ),
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
@@ -585,15 +816,9 @@ class _AccreditationScreenState extends State<AccreditationScreen> {
             },
           );
         },
-        label: Text('Add Accreditation'),
-        icon: Icon(Icons.add),
+        label: const Text('Add Accreditation'),
+        icon: const Icon(Icons.add),
       ),
     );
   }
-}
-
-void main() {
-  runApp(MaterialApp(
-    home: AccreditationScreen(userData: {}),
-  ));
 }

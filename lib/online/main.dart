@@ -1,19 +1,23 @@
+// ignore_for_file: unused_field, unused_element
+
 import 'package:flutter/material.dart';
 import 'package:query_app/main.dart';
-import 'package:query_app/online/settings.dart';
-import 'package:query_app/online/report.dart';
-import 'package:query_app/online/leaders_members.dart';
 import 'package:query_app/online/accreditation.dart';
 import 'package:query_app/online/household.dart';
+import 'package:query_app/online/leaders_members.dart';
+import 'package:query_app/online/report.dart';
+import 'package:query_app/online/settings.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       debugShowCheckedModeBanner: false,
       home: MyHomePageOnline(userData: {}), // Initialize with an empty map
     );
@@ -23,21 +27,16 @@ class MyApp extends StatelessWidget {
 class MyHomePageOnline extends StatefulWidget {
   final Map<String, dynamic> userData;
 
-  MyHomePageOnline({required this.userData});
+  const MyHomePageOnline({Key? key, required this.userData}) : super(key: key);
 
   @override
-  _MyHomePageState createState() => _MyHomePageState(userData: userData);
+  State<MyHomePageOnline> createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePageOnline> {
-  final Map<String, dynamic> userData;
-
-  _MyHomePageState({required this.userData});
-
   int _selectedIndex = 0;
 
-  Widget _buildListTile(
-      String title, IconData iconData, double fontSize, VoidCallback onTap) {
+  Widget _buildListTile(String title, IconData iconData, double fontSize, VoidCallback onTap) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 2),
       child: Card(
@@ -71,46 +70,25 @@ class _MyHomePageState extends State<MyHomePageOnline> {
     Navigator.of(context).pop();
     switch (routeName) {
       case 'Home':
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => MyHomePageOnline(userData: userData)));
+        Navigator.push(context, MaterialPageRoute(builder: (context) => MyHomePageOnline(userData: widget.userData)));
         break;
       case 'Accreditation':
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => AccreditationScreen(userData: userData)));
+        Navigator.push(context, MaterialPageRoute(builder: (context) => AccreditationScreen(userData: widget.userData)));
         break;
       case 'Leaders and Members':
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => LeadersScreen(userData: userData)));
+        Navigator.push(context, MaterialPageRoute(builder: (context) => LeadersScreen(userData: widget.userData)));
         break;
       case 'Household':
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => houseHoldScreen(userData: userData)));
+        Navigator.push(context, MaterialPageRoute(builder: (context) => houseHoldScreen(userData: widget.userData)));
         break;
       case 'Report':
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => ReportScreen(userData: userData)));
+        Navigator.push(context, MaterialPageRoute(builder: (context) => ReportScreen(userData: widget.userData)));
         break;
       case 'Settings':
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => SettingsScreen(userData: userData)));
+        Navigator.push(context, MaterialPageRoute(builder: (context) => SettingsScreen(userData: widget.userData)));
         break;
       case 'Logout':
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => LoginScreen(userData: widget.userData)));
+        Navigator.push(context, MaterialPageRoute(builder: (context) => LoginScreen(userData: widget.userData)));
         break;
     }
   }
@@ -118,26 +96,26 @@ class _MyHomePageState extends State<MyHomePageOnline> {
   @override
   Widget build(BuildContext context) {
     final userData = widget.userData;
-    final userImage = AssetImage('assets/images/avatar.png');
+    const userImage = AssetImage('assets/images/avatar.png');
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Home Screen'),
+        title: const Text('Home Screen'),
       ),
       drawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
           children: <Widget>[
             DrawerHeader(
-              decoration: BoxDecoration(color: Colors.white),
+              decoration: const BoxDecoration(color: Colors.white),
               child: SingleChildScrollView(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
                     Container(
                       width: double.infinity,
-                      padding: EdgeInsets.all(10),
+                      padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
                         color: Colors.blueAccent,
                         borderRadius: BorderRadius.circular(8),
@@ -145,24 +123,24 @@ class _MyHomePageState extends State<MyHomePageOnline> {
                           BoxShadow(
                             color: Colors.black.withOpacity(0.3),
                             blurRadius: 3,
-                            offset: Offset(0, 2),
+                            offset: const Offset(0, 2),
                           ),
                         ],
                       ),
                       child: Column(
                         children: [
-                          CircleAvatar(
+                          const CircleAvatar(
                             radius: 30,
                             backgroundImage: userImage,
                           ),
                           Text(
                             '${userData['user_name']}',
-                            style: TextStyle(color: Colors.white, fontSize: 20),
+                            style: const TextStyle(color: Colors.white, fontSize: 20),
                           ),
-                          SizedBox(height: 5),
+                          const SizedBox(height: 5),
                           Text(
                             '${userData['user_email']}',
-                            style: TextStyle(color: Colors.white, fontSize: 16),
+                            style: const TextStyle(color: Colors.white, fontSize: 16),
                           ),
                         ],
                       ),

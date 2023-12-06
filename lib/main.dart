@@ -5,7 +5,7 @@ import 'package:query_app/online/signup.dart';
 import 'package:query_app/online/main.dart';
 
 void main() {
-  runApp(MaterialApp(
+  runApp(const MaterialApp(
     debugShowCheckedModeBanner: false,
     home: ScaffoldMessenger(
       child: LoginScreen(userData: {}),
@@ -16,10 +16,10 @@ void main() {
 class LoginScreen extends StatefulWidget {
   final Map<String, dynamic> userData;
 
-  LoginScreen({required this.userData});
+  const LoginScreen({Key? key, required this.userData}) : super(key: key);
 
   @override
-  _LoginScreenState createState() => _LoginScreenState();
+  State<LoginScreen> createState() => _LoginScreenState();
 }
 
 class _LoginScreenState extends State<LoginScreen> {
@@ -31,13 +31,13 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: Text('Login Screen'),
+        title: const Text('Login Screen'),
       ),
       body: ListView(
         children: [
           Container(
-            margin: EdgeInsets.only(top: 170, bottom: 20),
-            child: Center(
+            margin: const EdgeInsets.only(top: 170, bottom: 20),
+            child: const Center(
               child: CircleAvatar(
                 radius: 50,
                 // Provide the path to your image asset
@@ -52,98 +52,91 @@ class _LoginScreenState extends State<LoginScreen> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
-                  Text(
+                  const Text(
                     'Login',
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   TextFormField(
                     controller: usernameController,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       labelText: 'Username',
                       border: OutlineInputBorder(),
                     ),
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   TextFormField(
                     controller: passwordController,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       labelText: 'Password',
                       border: OutlineInputBorder(),
                     ),
                     obscureText: true,
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: () async {
                       String username = usernameController.text;
                       String password = passwordController.text;
 
-                      var url = Uri.parse(
-                          'https://sweet-salvador.kenkarlo.com/PCUP-API/online/login.php');
+                      var url = Uri.parse('https://sweet-salvador.kenkarlo.com/PCUP-API/online/login.php');
                       var response = await http.post(
                         url,
                         headers: {'Content-Type': 'application/json'},
-                        body: json.encode(
-                            {'user_name': username, 'user_password': password}),
+                        body: json.encode({'user_name': username, 'user_password': password}),
                       );
-                      print("Response Body: ${response.body}");
-                      print("Status Code: ${response.statusCode}");
+                      debugPrint("Response Body: ${response.body}");
+                      debugPrint("Status Code: ${response.statusCode}");
 
                       if (response.statusCode == 200) {
                         var data = json.decode(response.body);
                         String responseBody = response.body;
+                        // ignore: unused_local_variable
                         String errorMessage = '';
 
                         if (data.containsKey('user_id')) {
                           Map<String, dynamic> userData = data;
                           if (userData['user_remarks'] == 'APPROVED') {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('Successfully Login'),
-                                duration: Duration(seconds: 3),
-                              ),
-                            );
+                            WidgetsBinding.instance.addPostFrameCallback((_) => ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('Successfully Login'),
+                                    duration: Duration(seconds: 3),
+                                  ),
+                                ));
 
-                            Future.delayed(Duration(seconds: 3), () {
+                            Future.delayed(const Duration(seconds: 3), () {
                               Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) =>
-                                      MyHomePageOnline(userData: userData),
+                                  builder: (context) => MyHomePageOnline(userData: userData),
                                 ),
                               );
                             });
                           }
-                          if (responseBody
-                              .contains('Login failed. User not approved')) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content:
-                                    Text("Login failed. User not approved."),
-                                duration: Duration(seconds: 5),
-                              ),
-                            );
+                          if (responseBody.contains('Login failed. User not approved')) {
+                            WidgetsBinding.instance.addPostFrameCallback((_) => ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text("Login failed. User not approved."),
+                                    duration: Duration(seconds: 5),
+                                  ),
+                                ));
                           }
-                        } else if (responseBody
-                            .contains('Login failed. Invalid credentials.')) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content:
-                                  Text("Login failed. Invalid credentials."),
-                              duration: Duration(seconds: 5),
-                            ),
-                          );
+                        } else if (responseBody.contains('Login failed. Invalid credentials.')) {
+                          WidgetsBinding.instance.addPostFrameCallback((_) => ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text("Login failed. Invalid credentials."),
+                                  duration: Duration(seconds: 5),
+                                ),
+                              ));
                         }
                       } else {
-                        print(
-                            "API Error - Status Code: ${response.statusCode}");
+                        debugPrint("API Error - Status Code: ${response.statusCode}");
                       }
                     },
-                    child: Text('Login'),
+                    child: const Text('Login'),
                   ),
                   TextButton(
                     onPressed: () {
@@ -151,11 +144,11 @@ class _LoginScreenState extends State<LoginScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => SignUpScreen(),
+                          builder: (context) => const SignUpScreen(),
                         ),
                       );
                     },
-                    child: Text('Sign Up'),
+                    child: const Text('Sign Up'),
                   ),
                 ],
               ),

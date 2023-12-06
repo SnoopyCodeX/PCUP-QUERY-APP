@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:query_app/main.dart';
-import 'dart:convert';
-import 'package:query_app/online/main.dart';
 
 class SignUpScreen extends StatefulWidget {
+  const SignUpScreen({Key? key}) : super(key: key);
+
   @override
-  _SignUpScreenState createState() => _SignUpScreenState();
+  State<SignUpScreen> createState() => _SignUpScreenState();
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
@@ -22,7 +22,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Sign Up'),
+        title: const Text('Sign Up'),
       ),
       body: SingleChildScrollView(
         // Wrap the content with SingleChildScrollView
@@ -36,56 +36,56 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
-                    Text(
+                    const Text(
                       'Sign Up',
                       style: TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     TextFormField(
                       controller: usernameController,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         labelText: 'Username',
                         border: OutlineInputBorder(),
                       ),
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     TextFormField(
                       controller: passwordController,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         labelText: 'Password',
                         border: OutlineInputBorder(),
                       ),
                       obscureText: true,
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     TextFormField(
                       controller: fullnameController,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         labelText: 'Fullname',
                         border: OutlineInputBorder(),
                       ),
                       obscureText: true,
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     TextFormField(
                       controller: emailController,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         labelText: 'Email',
                         border: OutlineInputBorder(),
                       ),
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     TextFormField(
                       controller: phoneController,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         labelText: 'Phone',
                         border: OutlineInputBorder(),
                       ),
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     ElevatedButton(
                       onPressed: () async {
                         String username = usernameController.text;
@@ -95,8 +95,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         String phone = phoneController.text;
 
                         final response = await http.post(
-                          Uri.parse(
-                              'https://sweet-salvador.kenkarlo.com/PCUP-API/online/signup.php'),
+                          Uri.parse('https://sweet-salvador.kenkarlo.com/PCUP-API/online/signup.php'),
                           body: {
                             'user_name': username,
                             'user_password': password,
@@ -105,52 +104,47 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             'user_phone': phone,
                           },
                         );
-                        print("Response Body: ${response.body}");
+                        debugPrint("Response Body: ${response.body}");
 
                         if (response.statusCode == 200) {
-                          String responseBody =
-                              response.body; // Extract the response body
+                          String responseBody = response.body; // Extract the response body
 
-                          if (responseBody
-                              .contains('User registered successfully')) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('User registered successfully'),
-                                duration: Duration(seconds: 3),
-                              ),
-                            );
+                          if (responseBody.contains('User registered successfully')) {
+                            WidgetsBinding.instance.addPostFrameCallback((_) => ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('User registered successfully'),
+                                    duration: Duration(seconds: 3),
+                                  ),
+                                ));
 
                             // Delay the navigation to the login screen for 5 seconds
-                            Future.delayed(Duration(seconds: 3), () {
+                            Future.delayed(const Duration(seconds: 3), () {
                               Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) =>
-                                      LoginScreen(userData: userData),
+                                  builder: (context) => LoginScreen(userData: userData),
                                 ),
                               );
                             });
                             return; // Exit the function and the current page
-                          } else if (responseBody
-                              .contains('Email or username already exists')) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content:
-                                    Text('Email or username already exists'),
-                                duration: Duration(seconds: 2),
-                              ),
-                            );
+                          } else if (responseBody.contains('Email or username already exists')) {
+                            WidgetsBinding.instance.addPostFrameCallback((_) => ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('Email or username already exists'),
+                                    duration: Duration(seconds: 2),
+                                  ),
+                                ));
                           } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('Invalid request method'),
-                                duration: Duration(seconds: 2),
-                              ),
-                            );
+                            WidgetsBinding.instance.addPostFrameCallback((_) => ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('Invalid request method'),
+                                    duration: Duration(seconds: 2),
+                                  ),
+                                ));
                           }
                         }
                       },
-                      child: Text('Sign Up'),
+                      child: const Text('Sign Up'),
                     ),
                   ],
                 ),
