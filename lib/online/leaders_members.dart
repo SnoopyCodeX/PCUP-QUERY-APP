@@ -27,6 +27,8 @@ class _LeadersScreenState extends State<LeadersScreen> {
   List<Map<String, dynamic>> leaders = [];
   List<String> barangayNames = [];
   TextEditingController leaderNameController = TextEditingController();
+  TextEditingController leaderMiddlenameController = TextEditingController();
+  TextEditingController leaderLastnameController = TextEditingController();
   TextEditingController leaderPositionController = TextEditingController();
   TextEditingController leaderSexController = TextEditingController();
   TextEditingController leaderAgeController = TextEditingController();
@@ -46,6 +48,8 @@ class _LeadersScreenState extends State<LeadersScreen> {
   @override
   void dispose() {
     leaderNameController.dispose();
+    leaderMiddlenameController.dispose();
+    leaderLastnameController.dispose();
     leaderPositionController.dispose();
     leaderSexController.dispose();
     leaderAgeController.dispose();
@@ -181,6 +185,8 @@ class _LeadersScreenState extends State<LeadersScreen> {
 
   void clearTextControllers() {
     leaderNameController.clear();
+    leaderMiddlenameController.clear();
+    leaderLastnameController.clear();
     leaderPositionController.clear();
     leaderSexController.clear();
     leaderAgeController.clear();
@@ -224,6 +230,8 @@ class _LeadersScreenState extends State<LeadersScreen> {
       apiUrl,
       body: {
         'leader_name': leaderNameController.text,
+        'leader_lname': leaderLastnameController.text,
+        'leader_mname': leaderMiddlenameController.text,
         'leader_position': leaderPositionController.text,
         'leader_sex': leaderSexController.text,
         'leader_age': leaderAgeController.text.toString(),
@@ -268,6 +276,8 @@ class _LeadersScreenState extends State<LeadersScreen> {
       body: {
         'leader_id': leaders[index]['leader_id'],
         'leader_name': leaderNameController.text,
+        'leader_lname': leaderLastnameController.text,
+        'leader_mname': leaderMiddlenameController.text,
         'leader_position': leaderPositionController.text,
         'leader_sex': leaderSexController.text,
         'leader_age': leaderAgeController.text.toString(),
@@ -321,7 +331,17 @@ class _LeadersScreenState extends State<LeadersScreen> {
               children: [
                 TextFormField(
                   controller: leaderNameController,
-                  decoration: const InputDecoration(labelText: 'Leader Fullname (ex. Dela Cruz, Juan)'),
+                  decoration: const InputDecoration(labelText: 'Leader Firstname'),
+                ),
+
+                TextFormField(
+                  controller: leaderMiddlenameController,
+                  decoration: const InputDecoration(labelText: 'Leader Middlename'),
+                ),
+
+                TextFormField(
+                  controller: leaderLastnameController,
+                  decoration: const InputDecoration(labelText: 'Leader Lastname'),
                 ),
 
                 DropdownButtonFormField<String>(
@@ -486,6 +506,8 @@ class _LeadersScreenState extends State<LeadersScreen> {
 
   void _showUpdateDataDialog(BuildContext context, int index) {
     leaderNameController = TextEditingController(text: leaders[index]['leader_name'].toString());
+    leaderMiddlenameController = TextEditingController(text: leaders[index]['leader_mname'].toString());
+    leaderLastnameController = TextEditingController(text: leaders[index]['leader_lname'].toString());
     leaderPositionController = TextEditingController(text: leaders[index]['leader_position'].toString());
     leaderSexController = TextEditingController(text: leaders[index]['leader_sex'].toString());
     leaderAgeController = TextEditingController(text: leaders[index]['leader_age'].toString());
@@ -518,6 +540,16 @@ class _LeadersScreenState extends State<LeadersScreen> {
                 TextFormField(
                   controller: leaderNameController,
                   decoration: const InputDecoration(labelText: 'Leader Fullname (ex. Dela Cruz, Juan)'),
+                ),
+
+                TextFormField(
+                  controller: leaderMiddlenameController,
+                  decoration: const InputDecoration(labelText: 'Leader Middlename'),
+                ),
+
+                TextFormField(
+                  controller: leaderLastnameController,
+                  decoration: const InputDecoration(labelText: 'Leader Lastname'),
                 ),
 
                 DropdownButtonFormField<String>(
