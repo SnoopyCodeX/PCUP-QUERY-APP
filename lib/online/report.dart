@@ -10,6 +10,7 @@ import 'package:query_app/online/household.dart';
 import 'package:query_app/online/leaders_members.dart';
 import 'package:query_app/online/main.dart';
 import 'package:query_app/online/settings.dart';
+import 'package:query_app/source/crime_data_source.dart';
 import 'package:query_app/source/report_data_source.dart';
 
 class ReportScreen extends StatefulWidget {
@@ -34,6 +35,7 @@ class _ReportScreenState extends State<ReportScreen> {
   TextEditingController reportDate = TextEditingController();
   TextEditingController reportBarangay = TextEditingController();
   TextEditingController reportObjectives = TextEditingController();
+
   TextEditingController crimeViolation = TextEditingController();
   TextEditingController crimeDate = TextEditingController();
   TextEditingController crimeVictim = TextEditingController();
@@ -73,7 +75,9 @@ class _ReportScreenState extends State<ReportScreen> {
     super.initState();
     fetchBarangayNames();
     fetchBarangayCrimeNames();
+
     fetchReports();
+    fetchCrimes();
   }
 
   Future<void> fetchReports() async {
@@ -87,6 +91,32 @@ class _ReportScreenState extends State<ReportScreen> {
         if (data is List) {
           setState(() {
             reports = List<Map<String, dynamic>>.from(data);
+          });
+        } else {
+          // Handle the case where the API did not return a JSON array as expected.
+          debugPrint('API did not return valid JSON data.');
+        }
+      } else {
+        // Handle non-200 status codes, indicating an API error.
+        debugPrint('API Error: Status Code ${response.statusCode}');
+      }
+    } catch (e) {
+      // Handle exceptions, such as network errors or invalid JSON data.
+      debugPrint('Error fetching data: $e');
+    }
+  }
+
+  Future<void> fetchCrimes() async {
+    final Uri apiUrl = Uri.parse('http://sweet-salvador.kenkarlo.com/PCUP-API/online/fetch_crime.php');
+    try {
+      final response = await http.get(apiUrl);
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+
+        if (data is List) {
+          setState(() {
+            violators = List<Map<String, dynamic>>.from(data);
           });
         } else {
           // Handle the case where the API did not return a JSON array as expected.
@@ -270,7 +300,7 @@ class _ReportScreenState extends State<ReportScreen> {
     );
 
     if (response.statusCode == 200) {
-      fetchReports();
+      await fetchReports();
 
       WidgetsBinding.instance.addPostFrameCallback((_) => ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
@@ -278,11 +308,7 @@ class _ReportScreenState extends State<ReportScreen> {
             ),
           ));
 
-      reportName.clear();
-      reportBarangay.clear();
-      reportDate.clear();
-      reportFacilitator.clear();
-      reportObjectives.clear();
+      clearTextControllers();
     } else {
       WidgetsBinding.instance.addPostFrameCallback((_) => ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
@@ -339,21 +365,52 @@ class _ReportScreenState extends State<ReportScreen> {
     );
 
     if (response.statusCode == 200) {
+      await fetchCrimes();
+
       WidgetsBinding.instance.addPostFrameCallback((_) => ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Successfully Added'),
             ),
           ));
 
-      crimeViolation.clear();
-      crimeDate.clear();
-      crimeVictim.clear();
-      crimeViolator.clear();
-      crimeBarangay.clear();
+      clearTextControllers();
     } else {
       WidgetsBinding.instance.addPostFrameCallback((_) => ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Failed to submit data'),
+            ),
+          ));
+    }
+  }
+
+  void _submitUpdatedCrime(int index) async {
+    final apiUrl = Uri.parse('https://sweet-salvador.kenkarlo.com/PCUP-API/online/update_crime.php');
+    final response = await http.post(
+      apiUrl,
+      body: {
+        'crime_id': violators[index]['crime_id'],
+        'crime_violation': crimeViolation.text,
+        'crime_date': crimeDate.text,
+        'crime_victim': crimeVictim.text,
+        'crime_perpetrator': crimeViolator.text,
+        'crime_barangay': crimeBarangay.text,
+      },
+    );
+
+    if (response.statusCode == 200) {
+      await fetchCrimes();
+
+      WidgetsBinding.instance.addPostFrameCallback((_) => ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Successfully Updated'),
+            ),
+          ));
+
+      clearTextControllers();
+    } else {
+      WidgetsBinding.instance.addPostFrameCallback((_) => ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Failed to submit updated data'),
             ),
           ));
     }
@@ -640,6 +697,93 @@ class _ReportScreenState extends State<ReportScreen> {
     );
   }
 
+  void _showUpdateCrime(BuildContext context, int index) {
+    crimeViolation = TextEditingController(text: violators[index]['crime_violation'].toString());
+    crimeDate = TextEditingController(text: violators[index]['crime_date'].toString());
+    crimeVictim = TextEditingController(text: violators[index]['crime_victim'].toString());
+    crimeViolator = TextEditingController(text: violators[index]['crime_perpetrator'].toString());
+    crimeBarangay = TextEditingController(text: violators[index]['crime_barangay'].toString());
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Update Crime'),
+          content: SingleChildScrollView(
+            child: Column(
+              children: [
+                TextFormField(
+                  controller: crimeViolation,
+                  decoration: const InputDecoration(labelText: 'Crime Violation'),
+                ),
+                TextFormField(
+                  controller: crimeDate,
+                  decoration: const InputDecoration(
+                    labelText: 'Crime Date',
+                    hintText: 'Select date',
+                    labelStyle: TextStyle(color: Colors.grey),
+                    hintStyle: TextStyle(color: Colors.black),
+                    prefixIcon: Icon(Icons.calendar_today, color: Colors.blue),
+                    border: InputBorder.none,
+                    focusedBorder: InputBorder.none,
+                  ),
+                  onTap: () {
+                    _selectschedulecrimeDate(context);
+                  },
+                ),
+                TextFormField(
+                  controller: crimeVictim,
+                  decoration: const InputDecoration(labelText: 'Crime Victim'),
+                ),
+                TextFormField(
+                  controller: crimeViolator,
+                  decoration: const InputDecoration(labelText: 'Crime Violator'),
+                ),
+                DropdownButtonFormField<String>(
+                  decoration: const InputDecoration(labelText: 'Select Barangay'),
+                  value: crimeBarangay.text.toUpperCase(),
+                  items: barangayCrimeNames.map((String barangaycrimeName) {
+                    return DropdownMenuItem<String>(
+                      value: barangaycrimeName,
+                      child: Text(barangaycrimeName),
+                    );
+                  }).toList(),
+                  onChanged: (selectedBarangay) {
+                    setState(() {
+                      crimeBarangay.text = selectedBarangay ?? '';
+                    });
+                  },
+                ),
+
+                // Add more TextFormFields with respective controllers for other fields
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                clearTextControllers();
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () {
+                if (_validateFieldsCrime()) {
+                  _submitUpdatedCrime(index);
+                  Navigator.of(context).pop(); // Close the dialog
+                } else {
+                  _showRequiredFieldsAlertCrime(context);
+                }
+              },
+              child: const Text("Update"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final userData = widget.userData;
@@ -748,23 +892,56 @@ class _ReportScreenState extends State<ReportScreen> {
         ),
       ),
       body: SingleChildScrollView(
-        child: PaginatedDataTable(
-          columns: const [
-            DataColumn(label: Text('ID')),
-            DataColumn(label: Text('Name')),
-            DataColumn(label: Text('Facilitator')),
-            DataColumn(label: Text('Date')),
-            DataColumn(label: Text('Objective')),
-            DataColumn(label: Text('Barangay')),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Flexible(
+              child: SingleChildScrollView(
+                child: PaginatedDataTable(
+                  columns: const [
+                    DataColumn(label: Text('ID')),
+                    DataColumn(label: Text('Name')),
+                    DataColumn(label: Text('Facilitator')),
+                    DataColumn(label: Text('Date')),
+                    DataColumn(label: Text('Objective')),
+                    DataColumn(label: Text('Barangay')),
+                  ],
+                  source: ReportDataSource(
+                    data: reports,
+                    onLongPress: (selectedIndex) => _showUpdateReport(context, selectedIndex),
+                  ),
+                  rowsPerPage: reports.length < ROWS_PER_PAGE ? reports.length + 1 : ROWS_PER_PAGE,
+                  header: const Center(
+                    child: Text('Reports'),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 5),
+            Flexible(
+              child: SingleChildScrollView(
+                child: PaginatedDataTable(
+                  columns: const [
+                    DataColumn(label: Text('ID')),
+                    DataColumn(label: Text('Violation')),
+                    DataColumn(label: Text('Date')),
+                    DataColumn(label: Text('Victim')),
+                    DataColumn(label: Text('Perpetrator')),
+                    DataColumn(label: Text('Barangay')),
+                  ],
+                  source: CrimeDataSource(
+                    data: violators,
+                    onLongPress: (selectedIndex) => _showUpdateCrime(context, selectedIndex),
+                  ),
+                  rowsPerPage: violators.length < ROWS_PER_PAGE ? violators.length + 1 : ROWS_PER_PAGE,
+                  header: const Center(
+                    child: Text('Crimes'),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 300),
           ],
-          source: ReportDataSource(
-            data: reports,
-            onLongPress: (selectedIndex) => _showUpdateReport(context, selectedIndex),
-          ),
-          rowsPerPage: reports.length < ROWS_PER_PAGE ? reports.length + 1 : ROWS_PER_PAGE,
-          header: const Center(
-            child: Text('Reports'),
-          ),
         ),
       ),
       floatingActionButton: Column(
